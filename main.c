@@ -116,6 +116,9 @@ void mainLoop()
 		}
 
 		if (running && signal)
-			Wait(signal);
+			signal = Wait(signal | SIGBREAKF_CTRL_C);
+
+		if (signal & SIGBREAKF_CTRL_C)
+			break;
 	}
 }
