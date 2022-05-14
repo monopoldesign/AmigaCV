@@ -2,8 +2,8 @@
 #define _MAIN_H
 
 /******************************************************************************
-* MUI_MDIWindows
-* (C)2022 M.Volkel (mario.volkel@outlook.com)
+* AmigaCV
+* (C)2020-2022 M.Volkel (mario.volkel@outlook.com)
 *******************************************************************************/
 
 // Comment templates
@@ -58,8 +58,6 @@ extern struct Library *MUIMasterBase;
 extern struct Screen *myScreen;
 extern UBYTE *screenName;
 
-extern struct MUI_CustomClass *CL_mainW;
-extern struct MUI_CustomClass *CL_slaveW;
-extern Object *win2;
+extern struct MUI_CustomClass *CL_ctrlW;
 
 #endif

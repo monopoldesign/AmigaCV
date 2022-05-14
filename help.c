@@ -1,6 +1,6 @@
 /******************************************************************************
-* MUI_MDIWindows
-* (C)2022 M.Volkel (mario.volkel@outlook.com)
+* AmigaCV
+* (C)2020-2022 M.Volkel (mario.volkel@outlook.com)
 *******************************************************************************/
 
 // Comment templates
@@ -17,8 +17,7 @@
 * Header-Files
 *******************************************************************************/
 #include "main.h"
-#include "mainW.h"
-#include "slaveW.h"
+#include "ctrlW.h"
 #include "help.h"
 
 /******************************************************************************
@@ -68,10 +67,9 @@ void exitLibs(void)
 ------------------------------------------------------------------------------*/
 BOOL initClasses(void)
 {
-	CL_mainW = MUI_CreateCustomClass(NULL, MUIC_Window, NULL, sizeof(struct mainW_Data), mainW_Dispatcher);
-	CL_slaveW = MUI_CreateCustomClass(NULL, MUIC_Window, NULL, sizeof(struct slaveW_Data), slaveW_Dispatcher);
+	CL_ctrlW = MUI_CreateCustomClass(NULL, MUIC_Window, NULL, sizeof(struct ctrlW_Data), ctrlW_Dispatcher);
 
-	if (CL_mainW && CL_slaveW)
+	if (CL_ctrlW)
 		return TRUE;
 
 	exitClasses();
@@ -83,11 +81,8 @@ BOOL initClasses(void)
 ------------------------------------------------------------------------------*/
 void exitClasses(void)
 {
-	if (CL_mainW)
-		MUI_DeleteCustomClass(CL_mainW);
-
-	if (CL_slaveW)
-		MUI_DeleteCustomClass(CL_slaveW);
+	if (CL_ctrlW)
+		MUI_DeleteCustomClass(CL_ctrlW);
 }
 
 /*-----------------------------------------------------------------------------
@@ -99,7 +94,7 @@ BOOL SetupScreen(void)
 		SA_LikeWorkbench, TRUE,
 		SA_Type, PUBLICSCREEN,
 		SA_PubName, screenName,
-		SA_Title, "MUI_MDIWindows V0.1, (C)2022 M.Volkel",
+		SA_Title, "AmigaCV V0.1, (C)2020-2022 M.Volkel",
 		SA_ShowTitle, TRUE,
 		TAG_DONE)))
 	{

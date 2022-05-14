@@ -1,6 +1,6 @@
 /******************************************************************************
-* MUI_MDIWindows
-* (C)2022 M.Volkel (mario.volkel@outlook.com)
+* AmigaCV
+* (C)2020-2022 M.Volkel (mario.volkel@outlook.com)
 *******************************************************************************/
 
 // Comment templates
@@ -30,11 +30,9 @@ char buffer[40];
 struct Screen *myScreen;
 UBYTE *screenName = "MDISCREEN";
 
-Object *app, *mainWin;
+Object *app, *ctrlWin;
 
-struct MUI_CustomClass *CL_mainW;
-struct MUI_CustomClass *CL_slaveW;
-Object *win2 = NULL;
+struct MUI_CustomClass *CL_ctrlW;
 
 /******************************************************************************
 * Main-Program
@@ -58,7 +56,7 @@ int main(int argc, char *argv[])
 					MUIA_Application_Version,			"$VER: MUI_MDIWindows V0.1",
 					MUIA_Application_Copyright,			"(C)2022 M.Volkel",
 					MUIA_Application_Description,		"MUI-MDIWindows",
-					MUIA_Application_Window,			mainWin = NewObject(CL_mainW->mcc_Class, NULL, TAG_DONE),
+					MUIA_Application_Window,			ctrlWin = NewObject(CL_ctrlW->mcc_Class, NULL, TAG_DONE),
 					MUIA_Application_UseCommodities,	FALSE,
 					MUIA_Application_UseRexx,			FALSE,
 				End;
@@ -66,13 +64,13 @@ int main(int argc, char *argv[])
 				if (app)
 				{
 					// open Main-Window
-					set(mainWin, MUIA_Window_Open, TRUE);
+					set(ctrlWin, MUIA_Window_Open, TRUE);
 
 					// Application Main-Loop
 					mainLoop();
 
 					// close Main-Window
-					set(mainWin, MUIA_Window_Open, FALSE);
+					set(ctrlWin, MUIA_Window_Open, FALSE);
 
 					// Dispose App
 					MUI_DisposeObject(app);
@@ -109,7 +107,7 @@ void mainLoop()
 		{
 			// Window close
 			case MUIV_Application_ReturnID_Quit:
-				if ((MUI_RequestA(app, mainWin, 0, "Quit?", "_Yes|_No", "\33cAre you sure?", 0)) == 1)
+				if ((MUI_RequestA(app, ctrlWin, 0, "Quit?", "_Yes|_No", "\33cAre you sure?", 0)) == 1)
 					running = FALSE;
 			break;
 

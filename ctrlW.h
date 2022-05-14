@@ -1,5 +1,5 @@
-#ifndef _MAINW_H
-#define _MAINW_H
+#ifndef _CTRLW_H
+#define _CTRLW_H
 
 /******************************************************************************
 * MUI-Custom-Class
@@ -24,24 +24,22 @@
 /******************************************************************************
 * Prototypes
 *******************************************************************************/
-ULONG mainW_New(struct IClass *cl, Object *obj, struct opSet *msg);
-ULONG mainW_Finish(struct IClass *cl, Object *obj, struct MUIP_mainW_Finish *msg);
-ULONG mainW_newWindow(struct IClass *cl, Object *obj, Msg msg);
-DISPATCHER(mainW_Dispatcher);
+ULONG ctrlW_New(struct IClass *cl, Object *obj, struct opSet *msg);
+ULONG ctrlW_Finish(struct IClass *cl, Object *obj, struct MUIP_ctrlW_Finish *msg);
+DISPATCHER(ctrlW_Dispatcher);
 
 /******************************************************************************
 * Definitions
 *******************************************************************************/
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
-#define MUIM_mainW_Finish		TAGBASE_CLASS + 1
-#define MUIM_mainW_newWindow	TAGBASE_CLASS + 2
+#define MUIM_ctrlW_Finish		TAGBASE_CLASS + 1
 
-struct mainW_Data
+struct ctrlW_Data
 {
 	Object *BT_New;
 };
 
-struct MUIP_mainW_Finish
+struct MUIP_ctrlW_Finish
 {
 	ULONG MethodID;
 	LONG level;

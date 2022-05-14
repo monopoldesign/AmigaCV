@@ -2,8 +2,8 @@
 #define _HELP_H
 
 /******************************************************************************
-* MUI_MDIWindows
-* (C)2022 M.Volkel (mario.volkel@outlook.com)
+* AmigaCV
+* (C)2020-2022 M.Volkel (mario.volkel@outlook.com)
 *******************************************************************************/
 
 // Comment templates
