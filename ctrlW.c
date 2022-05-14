@@ -79,12 +79,18 @@ ULONG ctrlW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 	return 0;
 }
 
+/*-----------------------------------------------------------------------------
+- ctrlW_Finish
+------------------------------------------------------------------------------*/
 ULONG ctrlW_Finish(struct IClass *cl, Object *obj, Msg msg)
 {
 	DoMethod((Object *)xget(obj, MUIA_ApplicationObject), MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
 	return 0;
 }
 
+/*-----------------------------------------------------------------------------
+- ctrlW_Status
+------------------------------------------------------------------------------*/
 ULONG ctrlW_Status(struct IClass *cl, Object *obj, Msg msg)
 {
 	struct ctrlW_Data *data = INST_DATA(cl, obj);
@@ -105,6 +111,9 @@ ULONG ctrlW_Status(struct IClass *cl, Object *obj, Msg msg)
 	return 0;
 }
 
+/*-----------------------------------------------------------------------------
+- ctrlW_Tempo
+------------------------------------------------------------------------------*/
 ULONG ctrlW_Tempo(struct IClass *cl, Object *obj, struct MUIP_ctrlW_Tempo *msg)
 {
 	struct ctrlW_Data *data = INST_DATA(cl, obj);
