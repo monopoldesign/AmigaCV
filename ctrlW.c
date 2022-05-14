@@ -45,8 +45,7 @@ ULONG ctrlW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 		MUIA_Window_DepthGadget,	FALSE,
 		MUIA_Window_DragBar,		FALSE,
 		WindowContents,				HGroup,
-										Child, tmp.BT_Play = SimpleButton("Play"),
-										Child, tmp.BT_Stop = SimpleButton("Stop"),
+										Child, tmp.BT_Status = SimpleButton("Play"),
 										Child, tmp.TX_Tempo = TextObject,
 												MUIA_FixWidth, 20,
 												MUIA_Background, MUII_TextBack,
@@ -72,8 +71,7 @@ ULONG ctrlW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 		struct ctrlW_Data *data = INST_DATA(cl, obj);
 		*data = tmp;
 
-		DoMethod(data->BT_Play, MUIM_Notify, MUIA_Pressed, FALSE, obj, 2, MUIM_ctrlW_Status, 1);
-		DoMethod(data->BT_Stop, MUIM_Notify, MUIA_Pressed, FALSE, obj, 2, MUIM_ctrlW_Status, 0);
+		DoMethod(data->BT_Status, MUIM_Notify, MUIA_Pressed, FALSE, obj, 1, MUIM_ctrlW_Status);
 		DoMethod(data->SL_Tempo, MUIM_Notify, MUIA_Slider_Level, MUIV_EveryTime, obj, 2, MUIM_ctrlW_Tempo, MUIV_TriggerValue);
 
 		return (ULONG)obj;
@@ -87,20 +85,23 @@ ULONG ctrlW_Finish(struct IClass *cl, Object *obj, Msg msg)
 	return 0;
 }
 
-ULONG ctrlW_Status(struct IClass *cl, Object *obj, struct MUIP_ctrlW_Status *msg)
+ULONG ctrlW_Status(struct IClass *cl, Object *obj, Msg msg)
 {
 	struct ctrlW_Data *data = INST_DATA(cl, obj);
 
-	if (msg->status)
-	{
-		isPlaying = TRUE;
-		DoMethod(data->TX_Status, MUIM_Set, MUIA_Text_Contents, "Playing...");
-	}
-	else
+	if (isPlaying)
 	{
 		isPlaying = FALSE;
 		DoMethod(data->TX_Status, MUIM_Set, MUIA_Text_Contents, "Stopped...");
+		DoMethod(data->BT_Status, MUIM_Set, MUIA_Text_Contents, "Play");
 	}
+	else
+	{
+		isPlaying = TRUE;
+		DoMethod(data->TX_Status, MUIM_Set, MUIA_Text_Contents, "Playing...");
+		DoMethod(data->BT_Status, MUIM_Set, MUIA_Text_Contents, "Stop");
+	}
+
 	return 0;
 }
 

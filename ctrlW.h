@@ -26,7 +26,7 @@
 *******************************************************************************/
 ULONG ctrlW_New(struct IClass *cl, Object *obj, struct opSet *msg);
 ULONG ctrlW_Finish(struct IClass *cl, Object *obj, Msg msg);
-ULONG ctrlW_Status(struct IClass *cl, Object *obj, struct MUIP_ctrlW_Status *msg);
+ULONG ctrlW_Status(struct IClass *cl, Object *obj, Msg msg);
 ULONG ctrlW_Tempo(struct IClass *cl, Object *obj, struct MUIP_ctrlW_Tempo *msg);
 DISPATCHER(ctrlW_Dispatcher);
 
@@ -40,10 +40,9 @@ DISPATCHER(ctrlW_Dispatcher);
 
 struct ctrlW_Data
 {
-	Object *BT_Play, *BT_Stop, *TX_Tempo, *SL_Tempo, *TX_Status;
+	Object *BT_Status, *TX_Tempo, *SL_Tempo, *TX_Status;
 };
 
 struct MUIP_ctrlW_Tempo {ULONG MethodID; LONG level; };
-struct MUIP_ctrlW_Status {ULONG MethodID; LONG status; };
 
 #endif
