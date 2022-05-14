@@ -45,23 +45,26 @@ ULONG ctrlW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 		MUIA_Window_DepthGadget,	FALSE,
 		MUIA_Window_DragBar,		FALSE,
 		WindowContents,				HGroup,
-										Child, tmp.BT_New = SimpleButton("Play"),
-										Child, SimpleButton("Stop"),
-										Child, TextObject,
+										Child, tmp.BT_Play = SimpleButton("Play"),
+										Child, tmp.BT_Stop = SimpleButton("Stop"),
+										Child, tmp.TX_Tempo = TextObject,
 												MUIA_FixWidth, 20,
 												MUIA_Background, MUII_TextBack,
 												MUIA_Frame, MUIV_Frame_Text,
 												MUIA_Text_Contents, "120",
 										End,
-										Child, SliderObject,
+										Child, tmp.SL_Tempo = SliderObject,
 											MUIA_FixWidth, 200,
 											MUIA_Slider_Quiet, TRUE,
 											MUIA_Slider_Min, 20,
 											MUIA_Slider_Max, 240,
 											MUIA_Slider_Level, 120,
 										End,
-										Child, RectangleObject,
+										Child, tmp.TX_Status = TextObject,
 											MUIA_FixWidth, 300,
+											MUIA_Background, MUII_TextBack,
+											MUIA_Frame, MUIV_Frame_Text,
+											MUIA_Text_Contents, "Stopped...",
 										End,
 									End,
 		TAG_MORE, msg->ops_AttrList))
@@ -69,18 +72,46 @@ ULONG ctrlW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 		struct ctrlW_Data *data = INST_DATA(cl, obj);
 		*data = tmp;
 
-		DoMethod(obj, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, obj, 2, MUIM_ctrlW_Finish, 0);
+		DoMethod(data->BT_Play, MUIM_Notify, MUIA_Pressed, FALSE, obj, 2, MUIM_ctrlW_Status, 1);
+		DoMethod(data->BT_Stop, MUIM_Notify, MUIA_Pressed, FALSE, obj, 2, MUIM_ctrlW_Status, 0);
+		DoMethod(data->SL_Tempo, MUIM_Notify, MUIA_Slider_Level, MUIV_EveryTime, obj, 2, MUIM_ctrlW_Tempo, MUIV_TriggerValue);
 
 		return (ULONG)obj;
 	}
 	return 0;
 }
 
-ULONG ctrlW_Finish(struct IClass *cl, Object *obj, struct MUIP_ctrlW_Finish *msg)
+ULONG ctrlW_Finish(struct IClass *cl, Object *obj, Msg msg)
+{
+	DoMethod((Object *)xget(obj, MUIA_ApplicationObject), MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
+	return 0;
+}
+
+ULONG ctrlW_Status(struct IClass *cl, Object *obj, struct MUIP_ctrlW_Status *msg)
 {
 	struct ctrlW_Data *data = INST_DATA(cl, obj);
 
-	DoMethod((Object *)xget(obj, MUIA_ApplicationObject), MUIM_Application_ReturnID, MUIV_Application_ReturnID_Quit);
+	if (msg->status)
+	{
+		isPlaying = TRUE;
+		DoMethod(data->TX_Status, MUIM_Set, MUIA_Text_Contents, "Playing...");
+	}
+	else
+	{
+		isPlaying = FALSE;
+		DoMethod(data->TX_Status, MUIM_Set, MUIA_Text_Contents, "Stopped...");
+	}
+	return 0;
+}
+
+ULONG ctrlW_Tempo(struct IClass *cl, Object *obj, struct MUIP_ctrlW_Tempo *msg)
+{
+	struct ctrlW_Data *data = INST_DATA(cl, obj);
+
+	sprintf(buffer, "%d", msg->level);
+	DoMethod(data->TX_Tempo, MUIM_Set, MUIA_Text_Contents, buffer);
+	tempo = msg->level;
+
 	return 0;
 }
 
@@ -95,6 +126,10 @@ DISPATCHER(ctrlW_Dispatcher)
 			return ctrlW_New(cl, obj, (APTR)msg);
 		case MUIM_ctrlW_Finish:
 			return ctrlW_Finish(cl, obj, (APTR)msg);
+		case MUIM_ctrlW_Status:
+			return ctrlW_Status(cl, obj, (APTR)msg);
+		case MUIM_ctrlW_Tempo:
+			return ctrlW_Tempo(cl, obj, (APTR)msg);
 	}
 
 	return DoSuperMethodA(cl, obj, msg);

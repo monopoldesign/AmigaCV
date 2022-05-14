@@ -55,9 +55,14 @@ void mainLoop();
 extern struct IntuitionBase *IntuitionBase;
 extern struct Library *MUIMasterBase;
 
+extern char buffer[40];
+
 extern struct Screen *myScreen;
 extern UBYTE *screenName;
 
 extern struct MUI_CustomClass *CL_ctrlW;
+
+extern ULONG tempo;
+extern BOOL isPlaying;
 
 #endif
