@@ -32,8 +32,6 @@ ULONG ctrlW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 	struct ctrlW_Data tmp = {0};
 
 	if (obj = (Object *)DoSuperNew(cl, obj,
-		//MUIA_Window_Title,			"Control",
-		//MUIA_Window_ID,				MAKE_ID('C', 'T', 'R', 'L'),
 		MUIA_Window_TopEdge,		12,
 		MUIA_Window_LeftEdge,		0,
 		MUIA_Window_Width,			656,
@@ -45,22 +43,22 @@ ULONG ctrlW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 		MUIA_Window_DepthGadget,	FALSE,
 		MUIA_Window_DragBar,		FALSE,
 		WindowContents,				HGroup,
-										Child, tmp.BT_Status = SimpleButton("Play"),
-										Child, tmp.TX_Tempo = TextObject,
-												MUIA_FixWidth, 20,
-												MUIA_Background, MUII_TextBack,
-												MUIA_Frame, MUIV_Frame_Text,
-												MUIA_Text_Contents, "120",
+										Child, HGroup,
+											MUIA_FixWidth, 75,
+											Child, tmp.BT_Status = SimpleButton("Play"),
+											Child, tmp.STR_Tempo = StringObject,
+												MUIA_Frame, MUIV_Frame_String,
+												MUIA_String_Accept, "0123456789",
+												MUIA_String_MaxLen, 4,
+											End,
 										End,
 										Child, tmp.SL_Tempo = SliderObject,
 											MUIA_FixWidth, 200,
 											MUIA_Slider_Quiet, TRUE,
 											MUIA_Slider_Min, 20,
 											MUIA_Slider_Max, 240,
-											MUIA_Slider_Level, 120,
 										End,
 										Child, tmp.TX_Status = TextObject,
-											MUIA_FixWidth, 300,
 											MUIA_Background, MUII_TextBack,
 											MUIA_Frame, MUIV_Frame_Text,
 											MUIA_Text_Contents, "Stopped...",
@@ -71,8 +69,14 @@ ULONG ctrlW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 		struct ctrlW_Data *data = INST_DATA(cl, obj);
 		*data = tmp;
 
+		// Setup UI
+		DoMethod(data->STR_Tempo, MUIM_SetAsString, MUIA_String_Contents, "%ld", tempo);
+		DoMethod(data->SL_Tempo, MUIM_Set, MUIA_Slider_Level, tempo);
+
+		// Setup Methods
 		DoMethod(data->BT_Status, MUIM_Notify, MUIA_Pressed, FALSE, obj, 1, MUIM_ctrlW_Status);
-		DoMethod(data->SL_Tempo, MUIM_Notify, MUIA_Slider_Level, MUIV_EveryTime, obj, 2, MUIM_ctrlW_Tempo, MUIV_TriggerValue);
+		DoMethod(data->STR_Tempo, MUIM_Notify, MUIA_String_Acknowledge, MUIV_EveryTime, obj, 2, MUIM_ctrlW_STR_Tempo, MUIV_TriggerValue);
+		DoMethod(data->SL_Tempo, MUIM_Notify, MUIA_Slider_Level, MUIV_EveryTime, obj, 2, MUIM_ctrlW_SL_Tempo, MUIV_TriggerValue);
 
 		return (ULONG)obj;
 	}
@@ -112,15 +116,33 @@ ULONG ctrlW_Status(struct IClass *cl, Object *obj, Msg msg)
 }
 
 /*-----------------------------------------------------------------------------
-- ctrlW_Tempo
+- ctrlW_SL_Tempo
 ------------------------------------------------------------------------------*/
-ULONG ctrlW_Tempo(struct IClass *cl, Object *obj, struct MUIP_ctrlW_Tempo *msg)
+ULONG ctrlW_SL_Tempo(struct IClass *cl, Object *obj, struct MUIP_ctrlW_SL_Tempo *msg)
 {
 	struct ctrlW_Data *data = INST_DATA(cl, obj);
 
-	sprintf(buffer, "%d", msg->level);
-	DoMethod(data->TX_Tempo, MUIM_Set, MUIA_Text_Contents, buffer);
-	tempo = msg->level;
+	tempo = msg->tempo;
+	DoMethod(data->STR_Tempo, MUIM_SetAsString, MUIA_String_Contents, "%ld", tempo);
+
+	return 0;
+}
+
+/*-----------------------------------------------------------------------------
+- ctrlW_STR_Tempo
+------------------------------------------------------------------------------*/
+ULONG ctrlW_STR_Tempo(struct IClass *cl, Object *obj, struct MUIP_ctrlW_STR_Tempo *msg)
+{
+	struct ctrlW_Data *data = INST_DATA(cl, obj);
+	ULONG tmp;
+
+	tmp = atoi(msg->tempo);
+
+	if (tmp >= 20 && tmp <= 240)
+		tempo = tmp;
+
+	DoMethod(data->STR_Tempo, MUIM_SetAsString, MUIA_String_Contents, "%ld", tempo);
+	DoMethod(data->SL_Tempo, MUIM_Set, MUIA_Slider_Level, tempo);
 
 	return 0;
 }
@@ -138,8 +160,10 @@ DISPATCHER(ctrlW_Dispatcher)
 			return ctrlW_Finish(cl, obj, (APTR)msg);
 		case MUIM_ctrlW_Status:
 			return ctrlW_Status(cl, obj, (APTR)msg);
-		case MUIM_ctrlW_Tempo:
-			return ctrlW_Tempo(cl, obj, (APTR)msg);
+		case MUIM_ctrlW_SL_Tempo:
+			return ctrlW_SL_Tempo(cl, obj, (APTR)msg);
+		case MUIM_ctrlW_STR_Tempo:
+			return ctrlW_STR_Tempo(cl, obj, (APTR)msg);
 	}
 
 	return DoSuperMethodA(cl, obj, msg);
