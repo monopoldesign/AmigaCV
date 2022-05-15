@@ -24,18 +24,25 @@
 *******************************************************************************/
 struct IntuitionBase *IntuitionBase;
 struct Library *MUIMasterBase;
+struct Library *UtilityBase;
 
 char buffer[40];
 
 struct Screen *myScreen;
 UBYTE *screenName = "MDISCREEN";
 
-Object *app, *ctrlWin;
+Object *app, *ctrlWin, *inputWin, *outputWin;
 
 struct MUI_CustomClass *CL_ctrlW;
+struct MUI_CustomClass *CL_inputW;
+struct MUI_CustomClass *CL_outputW;
+struct MUI_CustomClass *CL_faderG;
 
 ULONG tempo = 120;
 BOOL isPlaying = FALSE;
+
+UBYTE AudioIn[8] = {0, 10, 20, 30, 40, 50, 60, 70};
+UBYTE AudioOut[8] = {70, 60, 50, 40, 30, 20, 10, 0};
 
 /******************************************************************************
 * Main-Program
@@ -69,8 +76,24 @@ int main(int argc, char *argv[])
 					// open Main-Window
 					set(ctrlWin, MUIA_Window_Open, TRUE);
 
+					// open Input-Window
+					inputWin = NewObject(CL_inputW->mcc_Class, NULL, TAG_DONE);
+					DoMethod(app, OM_ADDMEMBER, inputWin);
+					set(inputWin, MUIA_Window_Open, TRUE);
+
+					// open Output-Window
+					outputWin = NewObject(CL_outputW->mcc_Class, NULL, TAG_DONE);
+					DoMethod(app, OM_ADDMEMBER, outputWin);
+					set(outputWin, MUIA_Window_Open, TRUE);
+
 					// Application Main-Loop
 					mainLoop();
+
+					// close Output-Window
+					set(outputWin, MUIA_Window_Open, FALSE);
+
+					// close Input-Window
+					set(inputWin, MUIA_Window_Open, FALSE);
 
 					// close Main-Window
 					set(ctrlWin, MUIA_Window_Open, FALSE);

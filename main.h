@@ -30,6 +30,7 @@
 #include <pragma/gadtools_lib.h>
 #include <pragma/graphics_lib.h>
 #include <pragma/muimaster_lib.h>
+#include <pragma/utility_lib.h>
 
 /******************************************************************************
 * Macros
@@ -54,15 +55,24 @@ void mainLoop();
 *******************************************************************************/
 extern struct IntuitionBase *IntuitionBase;
 extern struct Library *MUIMasterBase;
+extern struct Library *UtilityBase;
 
 extern char buffer[40];
 
 extern struct Screen *myScreen;
 extern UBYTE *screenName;
 
+extern Object *app, *ctrlWin, *inputWin, *outputWin;
+
 extern struct MUI_CustomClass *CL_ctrlW;
+extern struct MUI_CustomClass *CL_inputW;
+extern struct MUI_CustomClass *CL_outputW;
+extern struct MUI_CustomClass *CL_faderG;
 
 extern ULONG tempo;
 extern BOOL isPlaying;
+
+extern UBYTE AudioIn[8];
+extern UBYTE AudioOut[8];
 
 #endif

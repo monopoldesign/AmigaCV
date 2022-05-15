@@ -18,6 +18,9 @@
 *******************************************************************************/
 #include "main.h"
 #include "ctrlW.h"
+#include "inputW.h"
+#include "outputW.h"
+#include "faderG.h"
 #include "help.h"
 
 /******************************************************************************
@@ -42,8 +45,9 @@ BOOL initLibs(void)
 {
 	IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library", 37);
 	MUIMasterBase = OpenLibrary(MUIMASTER_NAME, MUIMASTER_VMIN);
+	UtilityBase = OpenLibrary("utility.library", 39);
 
-	if (IntuitionBase && MUIMasterBase)
+	if (IntuitionBase && MUIMasterBase && UtilityBase)
 		return TRUE;
 
 	exitLibs();
@@ -55,6 +59,9 @@ BOOL initLibs(void)
 ------------------------------------------------------------------------------*/
 void exitLibs(void)
 {
+	if (UtilityBase)
+		CloseLibrary((struct Library *)UtilityBase);
+
 	if (MUIMasterBase)
 		CloseLibrary((struct Library *)MUIMasterBase);
 
@@ -68,8 +75,11 @@ void exitLibs(void)
 BOOL initClasses(void)
 {
 	CL_ctrlW = MUI_CreateCustomClass(NULL, MUIC_Window, NULL, sizeof(struct ctrlW_Data), ctrlW_Dispatcher);
+	CL_inputW = MUI_CreateCustomClass(NULL, MUIC_Window, NULL, sizeof(struct inputW_Data), inputW_Dispatcher);
+	CL_outputW = MUI_CreateCustomClass(NULL, MUIC_Window, NULL, sizeof(struct outputW_Data), outputW_Dispatcher);
+	CL_faderG = MUI_CreateCustomClass(NULL, MUIC_Group, NULL, sizeof(struct faderG_Data), faderG_Dispatcher);
 
-	if (CL_ctrlW)
+	if (CL_ctrlW && CL_inputW && CL_outputW && CL_faderG)
 		return TRUE;
 
 	exitClasses();
@@ -83,6 +93,15 @@ void exitClasses(void)
 {
 	if (CL_ctrlW)
 		MUI_DeleteCustomClass(CL_ctrlW);
+
+	if (CL_inputW)
+		MUI_DeleteCustomClass(CL_inputW);
+
+	if (CL_outputW)
+		MUI_DeleteCustomClass(CL_outputW);
+
+	if (CL_faderG)
+		MUI_DeleteCustomClass(CL_faderG);
 }
 
 /*-----------------------------------------------------------------------------

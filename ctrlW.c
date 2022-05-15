@@ -50,6 +50,7 @@ ULONG ctrlW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 												MUIA_Frame, MUIV_Frame_String,
 												MUIA_String_Accept, "0123456789",
 												MUIA_String_MaxLen, 4,
+												MUIA_String_Format, MUIV_String_Format_Center,
 											End,
 										End,
 										Child, tmp.SL_Tempo = SliderObject,
@@ -98,6 +99,7 @@ ULONG ctrlW_Finish(struct IClass *cl, Object *obj, Msg msg)
 ULONG ctrlW_Status(struct IClass *cl, Object *obj, Msg msg)
 {
 	struct ctrlW_Data *data = INST_DATA(cl, obj);
+	UBYTE i;
 
 	if (isPlaying)
 	{
@@ -111,6 +113,9 @@ ULONG ctrlW_Status(struct IClass *cl, Object *obj, Msg msg)
 		DoMethod(data->TX_Status, MUIM_Set, MUIA_Text_Contents, "Playing...");
 		DoMethod(data->BT_Status, MUIM_Set, MUIA_Text_Contents, "Stop");
 	}
+
+	for (i = 0; i < 8; i++)
+		printf("In%d: %d, Out%d: %d\n", i, AudioIn[i], i, AudioOut[i]);
 
 	return 0;
 }
