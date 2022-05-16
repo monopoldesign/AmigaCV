@@ -34,10 +34,11 @@ DISPATCHER(modifierW_Dispatcher);
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
 #define MUIM_modifierW_Finish	TAGBASE_CLASS + 1
 
-#define MUIA_modifierG_Channel 	TAGBASE_CLASS + 1
+#define MUIA_modifierW_Channel 	TAGBASE_CLASS + 1
 
 struct modifierW_Data
 {
+	Object *CY_Wave;
 	UBYTE chn;
 };
 

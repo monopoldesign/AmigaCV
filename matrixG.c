@@ -130,7 +130,7 @@ ULONG matrixG_Modify(struct IClass *cl, Object *obj, struct MUIP_matrixG_CheckBo
 
 	if (!modifierW[data->chn])
 	{
-		modifierW[data->chn] = NewObject(CL_modifierW->mcc_Class, NULL, MUIA_modifierG_Channel, data->chn, TAG_DONE);
+		modifierW[data->chn] = NewObject(CL_modifierW->mcc_Class, NULL, MUIA_modifierW_Channel, data->chn, TAG_DONE);
 		DoMethod((Object *)xget(obj, MUIA_ApplicationObject), OM_ADDMEMBER, modifierW[data->chn]);
 		set(modifierW[data->chn], MUIA_Window_Open, TRUE);
 	}

@@ -20,6 +20,7 @@
 #include "modifierW.h"
 #include "help.h"
 
+char winTitle[32 * 8];
 char *waveForm[5];
 
 /******************************************************************************
@@ -35,7 +36,7 @@ ULONG modifierW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 	struct TagItem *tags;
 
 	tags = msg->ops_AttrList;
-	tmp.chn = (UBYTE)GetTagData(MUIA_modifierG_Channel, 0, tags);
+	tmp.chn = (UBYTE)GetTagData(MUIA_modifierW_Channel, 0, tags);
 
 	waveForm[0] = "Sine";
 	waveForm[1] = "Triangle";
@@ -46,9 +47,9 @@ ULONG modifierW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 	switch (modType[tmp.chn])
 	{
 		case MOD_LFO:
-			sprintf(buffer, "MOD_LFO - Channel %d", tmp.chn + 1);
+			sprintf(winTitle + (32 * tmp.chn), "MOD_LFO - Channel %d", tmp.chn + 1);
 			obj = (Object *)DoSuperNew(cl, obj,
-								MUIA_Window_Title,			buffer,
+								MUIA_Window_Title,			winTitle + (32 * tmp.chn),
 								MUIA_Window_TopEdge,		220,
 								MUIA_Window_LeftEdge,		20,
 								MUIA_Window_Screen,			myScreen,
@@ -57,7 +58,7 @@ ULONG modifierW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 								WindowContents,				VGroup,
 																Child, HGroup,
 																	MUIA_Group_SameWidth, TRUE,
-																	Child, CycleObject,
+																	Child, tmp.CY_Wave = CycleObject,
 																		MUIA_Frame, MUIV_Frame_Button,
 																		MUIA_Cycle_Entries, waveForm,
 																	End,
@@ -74,10 +75,11 @@ ULONG modifierW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 															End,
 								TAG_MORE, msg->ops_AttrList);
 			break;
+
 		case MOD_DC:
-			sprintf(buffer, "MOD_DC - Channel %d", tmp.chn + 1);
+			sprintf(winTitle + (32 * tmp.chn), "MOD_DC - Channel %d", tmp.chn + 1);
 			obj = (Object *)DoSuperNew(cl, obj,
-								MUIA_Window_Title,			buffer,
+								MUIA_Window_Title,			winTitle + (32 * tmp.chn),
 								MUIA_Window_TopEdge,		220,
 								MUIA_Window_LeftEdge,		20,
 								MUIA_Window_Screen,			myScreen,
@@ -101,7 +103,6 @@ ULONG modifierW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 		*data = tmp;
 
 		DoMethod(obj, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, obj, 2, MUIM_modifierW_Finish, 0);
-
 		return (ULONG)obj;
 	}
 	return 0;
