@@ -31,18 +31,23 @@ char buffer[40];
 struct Screen *myScreen;
 UBYTE *screenName = "MDISCREEN";
 
-Object *app, *ctrlWin, *inputWin, *outputWin;
+Object *app, *ctrlWin, *inputWin, *outputWin, *matrixWin, *modifierW[8];
 
 struct MUI_CustomClass *CL_ctrlW;
 struct MUI_CustomClass *CL_inputW;
 struct MUI_CustomClass *CL_outputW;
+struct MUI_CustomClass *CL_matrixW;
+struct MUI_CustomClass *CL_modifierW;
 struct MUI_CustomClass *CL_faderG;
+struct MUI_CustomClass *CL_matrixG;
 
 ULONG tempo = 120;
 BOOL isPlaying = FALSE;
 
 UBYTE AudioIn[8] = {0, 10, 20, 30, 40, 50, 60, 70};
 UBYTE AudioOut[8] = {70, 60, 50, 40, 30, 20, 10, 0};
+UBYTE CVin[8] = {1, 2, 4, 8, 16, 32, 64, 128};
+UBYTE modType[8] = {MOD_LFO, MOD_DC, MOD_LFO, MOD_DC, MOD_LFO, MOD_DC, MOD_LFO, MOD_DC};
 
 /******************************************************************************
 * Main-Program
@@ -86,8 +91,16 @@ int main(int argc, char *argv[])
 					DoMethod(app, OM_ADDMEMBER, outputWin);
 					set(outputWin, MUIA_Window_Open, TRUE);
 
+					// open Matrix-Window
+					matrixWin = NewObject(CL_matrixW->mcc_Class, NULL, TAG_DONE);
+					DoMethod(app, OM_ADDMEMBER, matrixWin);
+					set(matrixWin, MUIA_Window_Open, TRUE);
+
 					// Application Main-Loop
 					mainLoop();
+
+					// close Matrix-Window
+					set(matrixWin, MUIA_Window_Open, FALSE);
 
 					// close Output-Window
 					set(outputWin, MUIA_Window_Open, FALSE);

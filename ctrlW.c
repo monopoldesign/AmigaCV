@@ -115,7 +115,7 @@ ULONG ctrlW_Status(struct IClass *cl, Object *obj, Msg msg)
 	}
 
 	for (i = 0; i < 8; i++)
-		printf("In%d: %d, Out%d: %d\n", i, AudioIn[i], i, AudioOut[i]);
+		printf("In%d: %d, Out%d: %d, CVin%d: %d\n", i, AudioIn[i], i, AudioOut[i], i, CVin[i]);
 
 	return 0;
 }

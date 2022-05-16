@@ -1,5 +1,5 @@
-#ifndef _FADERG_H
-#define _FADERG_H
+#ifndef _MATRIXW_H
+#define _MATRIXW_H
 
 /******************************************************************************
 * MUI-Custom-Class
@@ -24,27 +24,20 @@
 /******************************************************************************
 * Prototypes
 *******************************************************************************/
-ULONG faderG_New(struct IClass *cl, Object *obj, struct opSet *msg);
-DISPATCHER(faderG_Dispatcher);
+ULONG matrixW_New(struct IClass *cl, Object *obj, struct opSet *msg);
+ULONG matrixW_Finish(struct IClass *cl, Object *obj, Msg msg);
+DISPATCHER(matrixW_Dispatcher);
 
 /******************************************************************************
 * Definitions
 *******************************************************************************/
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
-#define MUIM_faderG_Finish		TAGBASE_CLASS + 1
-#define MUIM_faderG_Slider		TAGBASE_CLASS + 2
+#define MUIM_matrixW_Finish		TAGBASE_CLASS + 1
+#define MUIM_matrixW_Activate	TAGBASE_CLASS + 2
 
-#define MUIA_faderG_Dest		TAGBASE_CLASS + 1
-#define MUIA_faderG_Channel		TAGBASE_CLASS + 2
-
-struct faderG_Data
+struct matrixW_Data
 {
-	Object *SL_Level, *TXT_Level;
-	LONG level;
-	UBYTE *dest;
-	UBYTE chn;
+	ULONG dummy;
 };
-
-struct MUIP_faderG_SL_Tempo {ULONG MethodID; LONG level; };
 
 #endif

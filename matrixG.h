@@ -1,5 +1,5 @@
-#ifndef _FADERG_H
-#define _FADERG_H
+#ifndef _MATRIXG_H
+#define _MATRIXG_H
 
 /******************************************************************************
 * MUI-Custom-Class
@@ -24,27 +24,28 @@
 /******************************************************************************
 * Prototypes
 *******************************************************************************/
-ULONG faderG_New(struct IClass *cl, Object *obj, struct opSet *msg);
-DISPATCHER(faderG_Dispatcher);
+ULONG matrixG_New(struct IClass *cl, Object *obj, struct opSet *msg);
+DISPATCHER(matrixG_Dispatcher);
 
 /******************************************************************************
 * Definitions
 *******************************************************************************/
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
-#define MUIM_faderG_Finish		TAGBASE_CLASS + 1
-#define MUIM_faderG_Slider		TAGBASE_CLASS + 2
+#define MUIM_matrixG_Finish		TAGBASE_CLASS + 1
+#define MUIM_matrixG_CheckBox	TAGBASE_CLASS + 2
+#define MUIM_matrixG_Modify		TAGBASE_CLASS + 3
 
-#define MUIA_faderG_Dest		TAGBASE_CLASS + 1
-#define MUIA_faderG_Channel		TAGBASE_CLASS + 2
+#define MUIA_matrixG_Dest		TAGBASE_CLASS + 1
+#define MUIA_matrixG_Channel	TAGBASE_CLASS + 2
 
-struct faderG_Data
+struct matrixG_Data
 {
-	Object *SL_Level, *TXT_Level;
-	LONG level;
+	Object *bt, *cb[8];
+
 	UBYTE *dest;
 	UBYTE chn;
 };
 
-struct MUIP_faderG_SL_Tempo {ULONG MethodID; LONG level; };
+struct MUIP_matrixG_CheckBox {ULONG MethodID; LONG id; LONG state; };
 
 #endif

@@ -20,7 +20,10 @@
 #include "ctrlW.h"
 #include "inputW.h"
 #include "outputW.h"
+#include "matrixW.h"
+#include "modifierW.h"
 #include "faderG.h"
+#include "matrixG.h"
 #include "help.h"
 
 /******************************************************************************
@@ -77,9 +80,13 @@ BOOL initClasses(void)
 	CL_ctrlW = MUI_CreateCustomClass(NULL, MUIC_Window, NULL, sizeof(struct ctrlW_Data), ctrlW_Dispatcher);
 	CL_inputW = MUI_CreateCustomClass(NULL, MUIC_Window, NULL, sizeof(struct inputW_Data), inputW_Dispatcher);
 	CL_outputW = MUI_CreateCustomClass(NULL, MUIC_Window, NULL, sizeof(struct outputW_Data), outputW_Dispatcher);
-	CL_faderG = MUI_CreateCustomClass(NULL, MUIC_Group, NULL, sizeof(struct faderG_Data), faderG_Dispatcher);
+	CL_matrixW = MUI_CreateCustomClass(NULL, MUIC_Window, NULL, sizeof(struct matrixW_Data), matrixW_Dispatcher);
+	CL_modifierW = MUI_CreateCustomClass(NULL, MUIC_Window, NULL, sizeof(struct modifierW_Data), modifierW_Dispatcher);
 
-	if (CL_ctrlW && CL_inputW && CL_outputW && CL_faderG)
+	CL_faderG = MUI_CreateCustomClass(NULL, MUIC_Group, NULL, sizeof(struct faderG_Data), faderG_Dispatcher);
+	CL_matrixG = MUI_CreateCustomClass(NULL, MUIC_Group, NULL, sizeof(struct matrixG_Data), matrixG_Dispatcher);
+
+	if (CL_ctrlW && CL_inputW && CL_outputW && CL_matrixW && CL_modifierW && CL_faderG && CL_matrixG)
 		return TRUE;
 
 	exitClasses();
@@ -100,8 +107,17 @@ void exitClasses(void)
 	if (CL_outputW)
 		MUI_DeleteCustomClass(CL_outputW);
 
+	if (CL_matrixW)
+		MUI_DeleteCustomClass(CL_matrixW);
+
+	if (CL_modifierW)
+		MUI_DeleteCustomClass(CL_modifierW);
+
 	if (CL_faderG)
 		MUI_DeleteCustomClass(CL_faderG);
+
+	if (CL_matrixG)
+		MUI_DeleteCustomClass(CL_matrixG);
 }
 
 /*-----------------------------------------------------------------------------

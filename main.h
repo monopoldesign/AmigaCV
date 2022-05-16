@@ -50,6 +50,8 @@ void mainLoop();
 *******************************************************************************/
 #define MAKE_ID(a, b, c, d) ((ULONG)(a) << 24 | (ULONG)(b) << 16 | (ULONG)(c) << 8 | (ULONG)(d))
 
+enum MODTYPE {MOD_LFO, MOD_DC};
+
 /******************************************************************************
 * Global Variables
 *******************************************************************************/
@@ -62,17 +64,23 @@ extern char buffer[40];
 extern struct Screen *myScreen;
 extern UBYTE *screenName;
 
-extern Object *app, *ctrlWin, *inputWin, *outputWin;
+extern Object *app, *ctrlWin, *inputWin, *outputWin, *matrixWin, *modifierW[8];
 
 extern struct MUI_CustomClass *CL_ctrlW;
 extern struct MUI_CustomClass *CL_inputW;
 extern struct MUI_CustomClass *CL_outputW;
+extern struct MUI_CustomClass *CL_matrixW;
+extern struct MUI_CustomClass *CL_modifierW;
+
 extern struct MUI_CustomClass *CL_faderG;
+extern struct MUI_CustomClass *CL_matrixG;
 
 extern ULONG tempo;
 extern BOOL isPlaying;
 
 extern UBYTE AudioIn[8];
 extern UBYTE AudioOut[8];
+extern UBYTE CVin[8];
+extern UBYTE modType[8];
 
 #endif
