@@ -24,6 +24,7 @@
 #include "modifierW.h"
 #include "faderG.h"
 #include "matrixG.h"
+#include "lfoC.h"
 #include "help.h"
 
 /******************************************************************************
@@ -86,7 +87,9 @@ BOOL initClasses(void)
 	CL_faderG = MUI_CreateCustomClass(NULL, MUIC_Group, NULL, sizeof(struct faderG_Data), faderG_Dispatcher);
 	CL_matrixG = MUI_CreateCustomClass(NULL, MUIC_Group, NULL, sizeof(struct matrixG_Data), matrixG_Dispatcher);
 
-	if (CL_ctrlW && CL_inputW && CL_outputW && CL_matrixW && CL_modifierW && CL_faderG && CL_matrixG)
+	CL_lfoC = MUI_CreateCustomClass(NULL, MUIC_Area, NULL, sizeof(struct lfoC_Data), lfoC_Dispatcher);
+
+	if (CL_ctrlW && CL_inputW && CL_outputW && CL_matrixW && CL_modifierW && CL_faderG && CL_matrixG && CL_lfoC)
 		return TRUE;
 
 	exitClasses();
@@ -118,6 +121,9 @@ void exitClasses(void)
 
 	if (CL_matrixG)
 		MUI_DeleteCustomClass(CL_matrixG);
+
+	if (CL_lfoC)
+		MUI_DeleteCustomClass(CL_lfoC);
 }
 
 /*-----------------------------------------------------------------------------

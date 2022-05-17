@@ -1,5 +1,5 @@
-#ifndef _MODIFIERW_H
-#define _MODIFIERW_H
+#ifndef _LFOC_H
+#define _LFOC_H
 
 /******************************************************************************
 * MUI-Custom-Class
@@ -24,22 +24,23 @@
 /******************************************************************************
 * Prototypes
 *******************************************************************************/
-ULONG modifierW_New(struct IClass *cl, Object *obj, struct opSet *msg);
-ULONG modifierW_Finish(struct IClass *cl, Object *obj, Msg msg);
-DISPATCHER(modifierW_Dispatcher);
+ULONG lfoC_New(struct IClass *cl, Object *obj, struct opSet *msg);
+ULONG mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg);
+ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg);
+int lfoC_transformX(Object *obj, int x);
+int lfoC_transformY(Object *obj, int y);
+DISPATCHER(lfoC_Dispatcher);
 
 /******************************************************************************
 * Definitions
 *******************************************************************************/
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
-#define MUIM_modifierW_Finish	TAGBASE_CLASS + 1
 
-#define MUIA_modifierW_Channel 	TAGBASE_CLASS + 1
+#define MUIA_lfoC_Channel 	TAGBASE_CLASS + 1
 
-struct modifierW_Data
+struct lfoC_Data
 {
-	Object *CY_Wave, *LfoC;
-	UBYTE chn;
+	ULONG chn;
 };
 
 #endif

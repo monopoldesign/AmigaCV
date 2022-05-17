@@ -45,6 +45,10 @@
 int main(int argc, char *argv[]);
 void mainLoop();
 
+BOOL addLfoTask();
+void remLfoTask();
+void lfoTask();
+
 /******************************************************************************
 * Definitions
 *******************************************************************************/
@@ -71,9 +75,12 @@ extern struct MUI_CustomClass *CL_inputW;
 extern struct MUI_CustomClass *CL_outputW;
 extern struct MUI_CustomClass *CL_matrixW;
 extern struct MUI_CustomClass *CL_modifierW;
-
 extern struct MUI_CustomClass *CL_faderG;
 extern struct MUI_CustomClass *CL_matrixG;
+extern struct MUI_CustomClass *CL_lfoC;
+
+extern UBYTE lfoPos[8];
+extern Object *myLFO[8];
 
 extern ULONG tempo;
 extern BOOL isPlaying;

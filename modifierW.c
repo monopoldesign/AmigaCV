@@ -18,6 +18,7 @@
 *******************************************************************************/
 #include "main.h"
 #include "modifierW.h"
+#include "lfoC.h"
 #include "help.h"
 
 char winTitle[32 * 8];
@@ -55,23 +56,35 @@ ULONG modifierW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 								MUIA_Window_Screen,			myScreen,
 								MUIA_Window_SizeGadget,		FALSE,
 								MUIA_Window_DepthGadget,	FALSE,
-								WindowContents,				VGroup,
-																Child, HGroup,
+								WindowContents,				HGroup,
+																Child, VGroup,
 																	MUIA_Group_SameWidth, TRUE,
 																	Child, tmp.CY_Wave = CycleObject,
 																		MUIA_Frame, MUIV_Frame_Button,
 																		MUIA_Cycle_Entries, waveForm,
 																	End,
-																	Child, SliderObject,
-																		MUIA_Slider_Quiet, TRUE,
-																		MUIA_Slider_Min, 1,
-																		MUIA_Slider_Max, 99,
+																	Child, HGroup,
+																		Child, VGroup,
+																			Child, SliderObject,
+																				MUIA_Slider_Horiz, FALSE,
+																				MUIA_Slider_Quiet, TRUE,
+																				MUIA_Slider_Min, 1,
+																				MUIA_Slider_Max, 99,
+																			End,
+																			Child, Label("Freq"),
+																		End,
+																		Child, VGroup,
+																			Child, SliderObject,
+																				MUIA_Slider_Horiz, FALSE,
+																				MUIA_Slider_Quiet, TRUE,
+																				MUIA_Slider_Min, 1,
+																				MUIA_Slider_Max, 99,
+																			End,
+																			Child, Label("Offset"),
+																		End,
 																	End,
 																End,
-																Child, RectangleObject,
-																	MUIA_FixHeight,	75,
-																	MUIA_Frame, MUIV_Frame_Gauge,
-																End,
+																Child, myLFO[tmp.chn] = NewObject(CL_lfoC->mcc_Class, NULL, MUIA_lfoC_Channel, tmp.chn, TextFrame, MUIA_Background, MUII_BACKGROUND, TAG_DONE),
 															End,
 								TAG_MORE, msg->ops_AttrList);
 			break;
@@ -118,6 +131,7 @@ ULONG modifierW_Finish(struct IClass *cl, Object *obj, Msg msg)
 	set(obj, MUIA_Window_Open, FALSE);
 	DoMethod((Object *)xget(obj, MUIA_ApplicationObject), OM_REMMEMBER, obj);
 	modifierW[data->chn] = NULL;
+	myLFO[data->chn] = NULL;
 	MUI_DisposeObject(obj);
 
 	return 0;

@@ -40,6 +40,21 @@ struct MUI_CustomClass *CL_matrixW;
 struct MUI_CustomClass *CL_modifierW;
 struct MUI_CustomClass *CL_faderG;
 struct MUI_CustomClass *CL_matrixG;
+struct MUI_CustomClass *CL_lfoC;
+
+#define STACK_SIZE 1000L
+struct Task *lfoTaskPtr = NULL;
+char *lfoTaskname = "LFOTask";
+UBYTE lfoPos[8];
+UBYTE lfoAdd[8];
+
+volatile UBYTE taskRunning = FALSE;
+volatile UBYTE taskRemove = FALSE;
+
+struct MsgPort *TimerMP;
+struct timerequest *TimerIO;
+
+Object *myLFO[8];
 
 ULONG tempo = 120;
 BOOL isPlaying = FALSE;
@@ -58,6 +73,8 @@ s* Main-Program
 ------------------------------------------------------------------------------*/
 int main(int argc, char *argv[])
 {
+	int i;
+
 	if (initLibs())
 	{
 		if (SetupScreen())
@@ -78,6 +95,12 @@ int main(int argc, char *argv[])
 
 				if (app)
 				{
+					for (i = 0; i < 8; i++)
+					{
+						lfoPos[i] = RangeRand(255);
+						lfoAdd[i] = RangeRand(10);
+					}
+
 					// open Main-Window
 					set(ctrlWin, MUIA_Window_Open, TRUE);
 
@@ -96,8 +119,14 @@ int main(int argc, char *argv[])
 					DoMethod(app, OM_ADDMEMBER, matrixWin);
 					set(matrixWin, MUIA_Window_Open, TRUE);
 
-					// Application Main-Loop
-					mainLoop();
+					if (addLfoTask())
+					{
+						// Application Main-Loop
+						mainLoop();
+
+						if (taskRunning)
+							remLfoTask();
+					}
 
 					// close Matrix-Window
 					set(matrixWin, MUIA_Window_Open, FALSE);
@@ -160,4 +189,82 @@ void mainLoop()
 		if (signal & SIGBREAKF_CTRL_C)
 			break;
 	}
+}
+
+/*-----------------------------------------------------------------------------
+- addLfoTask()
+------------------------------------------------------------------------------*/
+BOOL addLfoTask()
+{
+	if (!taskRunning)
+	{
+		if (lfoTaskPtr = CreateTask(lfoTaskname, 0, lfoTask, STACK_SIZE))
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+/*-----------------------------------------------------------------------------
+- remLfoTask()
+------------------------------------------------------------------------------*/
+void remLfoTask()
+{
+	if (taskRunning)
+	{
+		taskRemove = TRUE;
+		while (taskRunning);
+
+		taskRemove = FALSE;
+		Forbid();
+		DeleteTask(lfoTaskPtr);
+		Permit();
+	}
+}
+
+/*-----------------------------------------------------------------------------
+- lfoTask()
+------------------------------------------------------------------------------*/
+void lfoTask()
+{
+	struct MsgPort *TimerMP_Task;
+	struct timerequest *TimerIO_Task;
+	int i;
+
+	if (TimerMP_Task = CreatePort(0, 0))
+	{
+		if (TimerIO_Task = (struct timerequest *)CreateExtIO(TimerMP_Task, sizeof(struct timerequest)))
+		{
+			if (!(OpenDevice(TIMERNAME, UNIT_MICROHZ, (struct IORequest *)TimerIO_Task, 0)))
+			{
+				taskRunning = TRUE;
+
+				while (1)
+				{
+					for (i = 0; i < 8; i++)
+					{
+						lfoPos[i] += lfoAdd[i];
+
+						if (myLFO[i])
+							DoMethod(myLFO[i], MUIM_Draw);
+					}
+
+					TimerIO_Task->tr_node.io_Command = TR_ADDREQUEST;
+					TimerIO_Task->tr_time.tv_secs = 0;
+					TimerIO_Task->tr_time.tv_micro = 50 * 1000;
+					DoIO((struct IORequest *)TimerIO_Task);
+
+					if (taskRemove)
+						break;
+				}
+
+				CloseDevice((struct IORequest *)TimerIO_Task);
+			}
+			DeleteExtIO((struct IORequest *)TimerIO_Task);
+		}
+		DeletePort(TimerMP_Task);
+	}
+
+	taskRunning = FALSE;
+	Wait(0L);
 }
