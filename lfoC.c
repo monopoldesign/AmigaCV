@@ -88,22 +88,30 @@ ULONG mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 	SetAPen(_rp(obj), _dri(obj)->dri_Pens[DETAILPEN]);
 	RectFill(_rp(obj), _mleft(obj), _mtop(obj), _mright(obj), _mbottom(obj));
 
-	SetAPen(_rp(obj), _dri(obj)->dri_Pens[TEXTPEN]);
+	SetAPen(_rp(obj), _dri(obj)->dri_Pens[FILLPEN]);
 
 	x = lfoC_transformX(obj, lfoPos[data->chn]);
 
 	Move(_rp(obj), x, _mtop(obj));
 	Draw(_rp(obj), x, _mbottom(obj));
 
-	/*
-	for (i = 0; i < 255; i += 5)
+	SetAPen(_rp(obj), _dri(obj)->dri_Pens[TEXTPEN]);
+
+	for (i = 0; i < 255; i += 2)
 	{
 		int x = lfoC_transformX(obj, i);
 		int y = lfoC_transformY(obj, sineWave[i]);
 
+		//Move(_rp(obj), x, y);
+
+		//x = lfoC_transformX(obj, i);
+		//y = lfoC_transformY(obj, sineWave[i + 1]);
+
+		//Draw(_rp(obj), x, y);
+
 		WritePixel(_rp(obj), x, y);
 	}
-	*/
+
 	return (0);
 }
 

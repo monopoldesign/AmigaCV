@@ -80,6 +80,7 @@ extern struct MUI_CustomClass *CL_matrixG;
 extern struct MUI_CustomClass *CL_lfoC;
 
 extern UBYTE lfoPos[8];
+extern UBYTE lfoAdd[8];
 extern Object *myLFO[8];
 
 extern ULONG tempo;

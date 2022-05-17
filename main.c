@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 					for (i = 0; i < 8; i++)
 					{
 						lfoPos[i] = RangeRand(255);
-						lfoAdd[i] = RangeRand(10);
+						lfoAdd[i] = RangeRand(5) + 5;
 					}
 
 					// open Main-Window
@@ -251,7 +251,7 @@ void lfoTask()
 
 					TimerIO_Task->tr_node.io_Command = TR_ADDREQUEST;
 					TimerIO_Task->tr_time.tv_secs = 0;
-					TimerIO_Task->tr_time.tv_micro = 50 * 1000;
+					TimerIO_Task->tr_time.tv_micro = 100 * 1000;
 					DoIO((struct IORequest *)TimerIO_Task);
 
 					if (taskRemove)
