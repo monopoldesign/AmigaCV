@@ -33,13 +33,20 @@ DISPATCHER(modifierW_Dispatcher);
 *******************************************************************************/
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
 #define MUIM_modifierW_Finish	TAGBASE_CLASS + 1
+#define MUIM_modifierW_Speed	TAGBASE_CLASS + 2
+#define MUIM_modifierW_Wave		TAGBASE_CLASS + 3
+#define MUIM_modifierW_Offset	TAGBASE_CLASS + 4
 
 #define MUIA_modifierW_Channel 	TAGBASE_CLASS + 1
 
 struct modifierW_Data
 {
-	Object *CY_Wave, *LfoC;
+	Object *CY_Wave, *SL_Speed, *SL_Offset;
 	UBYTE chn;
 };
+
+struct MUIP_modifierW_CY_Wave {ULONG MethodID; LONG wave; };
+struct MUIP_modifierW_SL_Speed {ULONG MethodID; LONG speed; };
+struct MUIP_modifierW_SL_Offset {ULONG MethodID; LONG offset; };
 
 #endif

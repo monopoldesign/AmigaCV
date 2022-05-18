@@ -18,6 +18,7 @@
 *******************************************************************************/
 #include "main.h"
 #include "help.h"
+#include "lfoC.h"
 
 /******************************************************************************
 * Global Variables
@@ -44,9 +45,6 @@ struct MUI_CustomClass *CL_lfoC;
 
 #define STACK_SIZE 1000L
 struct Task *lfoTaskPtr = NULL;
-char *lfoTaskname = "LFOTask";
-UBYTE lfoPos[8];
-UBYTE lfoAdd[8];
 
 volatile UBYTE taskRunning = FALSE;
 volatile UBYTE taskRemove = FALSE;
@@ -55,6 +53,15 @@ struct MsgPort *TimerMP;
 struct timerequest *TimerIO;
 
 Object *myLFO[8];
+volatile UBYTE phaseCnt[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+volatile ULONG sampleCnt[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+volatile BYTE LFOVal[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+UBYTE LFOWave[8] = {0, 0, 1, 1, 2, 2, 3, 3};
+UBYTE LFOSpeed[8] = {8, 8, 16, 16, 32, 32, 64, 64};
+BYTE LFOOffset[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+unsigned int dispCnt = 0;
 
 ULONG tempo = 120;
 BOOL isPlaying = FALSE;
@@ -73,8 +80,6 @@ s* Main-Program
 ------------------------------------------------------------------------------*/
 int main(int argc, char *argv[])
 {
-	int i;
-
 	if (initLibs())
 	{
 		if (SetupScreen())
@@ -95,12 +100,6 @@ int main(int argc, char *argv[])
 
 				if (app)
 				{
-					for (i = 0; i < 8; i++)
-					{
-						lfoPos[i] = RangeRand(255);
-						lfoAdd[i] = RangeRand(5) + 5;
-					}
-
 					// open Main-Window
 					set(ctrlWin, MUIA_Window_Open, TRUE);
 
@@ -198,7 +197,7 @@ BOOL addLfoTask()
 {
 	if (!taskRunning)
 	{
-		if (lfoTaskPtr = CreateTask(lfoTaskname, 0, lfoTask, STACK_SIZE))
+		if (lfoTaskPtr = CreateTask("LFOTask", 0, lfoTask, STACK_SIZE))
 			return TRUE;
 	}
 
@@ -243,15 +242,32 @@ void lfoTask()
 				{
 					for (i = 0; i < 8; i++)
 					{
-						lfoPos[i] += lfoAdd[i];
+						//LFOVal[i] = sineWave[phaseCnt[i]];
 
-						if (myLFO[i])
-							DoMethod(myLFO[i], MUIM_Draw);
+						if (sampleCnt[i] >= LFOSpeed[i])
+						{
+							sampleCnt[i] = 0;
+							phaseCnt[i]++;
+						}
+						else
+							sampleCnt[i]++;
+					}
+
+					dispCnt++;
+					if (dispCnt >= 200)		// 200 * 200us = 25Hz
+					{
+						dispCnt = 0;
+
+						for (i = 0; i < 8; i++)
+						{
+							if (myLFO[i])
+								DoMethod(myLFO[i], MUIM_lfoC_Update);
+						}
 					}
 
 					TimerIO_Task->tr_node.io_Command = TR_ADDREQUEST;
 					TimerIO_Task->tr_time.tv_secs = 0;
-					TimerIO_Task->tr_time.tv_micro = 100 * 1000;
+					TimerIO_Task->tr_time.tv_micro = 2 * 100;
 					DoIO((struct IORequest *)TimerIO_Task);
 
 					if (taskRemove)

@@ -79,9 +79,14 @@ extern struct MUI_CustomClass *CL_faderG;
 extern struct MUI_CustomClass *CL_matrixG;
 extern struct MUI_CustomClass *CL_lfoC;
 
-extern UBYTE lfoPos[8];
-extern UBYTE lfoAdd[8];
 extern Object *myLFO[8];
+extern volatile UBYTE phaseCnt[8];
+extern volatile ULONG sampleCnt[8];
+extern volatile BYTE LFOVal[8];
+
+extern UBYTE LFOWave[8];
+extern UBYTE LFOSpeed[8];
+extern BYTE LFOOffset[8];
 
 extern ULONG tempo;
 extern BOOL isPlaying;
