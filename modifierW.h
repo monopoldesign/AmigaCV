@@ -36,12 +36,14 @@ DISPATCHER(modifierW_Dispatcher);
 #define MUIM_modifierW_Speed	TAGBASE_CLASS + 2
 #define MUIM_modifierW_Wave		TAGBASE_CLASS + 3
 #define MUIM_modifierW_Offset	TAGBASE_CLASS + 4
+#define MUIM_modifierW_Update	TAGBASE_CLASS + 5
 
 #define MUIA_modifierW_Channel 	TAGBASE_CLASS + 1
 
 struct modifierW_Data
 {
 	Object *CY_Wave, *SL_Speed, *SL_Offset;
+	Object *FG[16];
 	UBYTE chn;
 };
 

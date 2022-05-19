@@ -33,6 +33,7 @@ DISPATCHER(faderCvSeqG_Dispatcher);
 *******************************************************************************/
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
 #define MUIM_faderCvSeqG_Slider		TAGBASE_CLASS + 1
+#define MUIM_faderCvSeqG_Update		TAGBASE_CLASS + 2
 
 #define MUIA_faderCvSeqG_Dest		TAGBASE_CLASS + 1
 #define MUIA_faderCvSeqG_Channel	TAGBASE_CLASS + 2
@@ -40,6 +41,7 @@ DISPATCHER(faderCvSeqG_Dispatcher);
 struct faderCvSeqG_Data
 {
 	Object *SL_Level, *TXT_Level;
+	Object *led;
 	LONG level;
 	UBYTE *dest;
 	UBYTE chn;

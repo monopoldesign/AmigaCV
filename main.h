@@ -49,6 +49,10 @@ BOOL addLfoTask();
 void remLfoTask();
 void lfoTask();
 
+BOOL addSeqTask();
+void remSeqTask();
+void seqTask();
+
 /******************************************************************************
 * Definitions
 *******************************************************************************/
@@ -90,7 +94,8 @@ extern UBYTE LFOWave[8];
 extern UBYTE LFOSpeed[8];
 extern BYTE LFOOffset[8];
 
-extern BYTE CVSeq[16];
+extern UBYTE CVSeq[16];
+extern UBYTE seqPos[8];
 
 extern ULONG tempo;
 extern BOOL isPlaying;

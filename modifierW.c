@@ -139,22 +139,22 @@ ULONG modifierW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 																End,
 																*/
 																Child, HGroup,
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[0], MUIA_faderCvSeqG_Channel, 0, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[1], MUIA_faderCvSeqG_Channel, 1, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[2], MUIA_faderCvSeqG_Channel, 2, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[3], MUIA_faderCvSeqG_Channel, 3, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[4], MUIA_faderCvSeqG_Channel, 4, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[5], MUIA_faderCvSeqG_Channel, 5, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[6], MUIA_faderCvSeqG_Channel, 6, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[7], MUIA_faderCvSeqG_Channel, 7, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[8], MUIA_faderCvSeqG_Channel, 8, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[9], MUIA_faderCvSeqG_Channel, 9, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[10], MUIA_faderCvSeqG_Channel, 10, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[11], MUIA_faderCvSeqG_Channel, 11, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[12], MUIA_faderCvSeqG_Channel, 12, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[13], MUIA_faderCvSeqG_Channel, 13, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[14], MUIA_faderCvSeqG_Channel, 14, TAG_DONE),
-																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[15], MUIA_faderCvSeqG_Channel, 15, TAG_DONE),
+																	Child, tmp.FG[0] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[0], MUIA_faderCvSeqG_Channel, 0, TAG_DONE),
+																	Child, tmp.FG[1] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[1], MUIA_faderCvSeqG_Channel, 1, TAG_DONE),
+																	Child, tmp.FG[2] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[2], MUIA_faderCvSeqG_Channel, 2, TAG_DONE),
+																	Child, tmp.FG[3] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[3], MUIA_faderCvSeqG_Channel, 3, TAG_DONE),
+																	Child, tmp.FG[4] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[4], MUIA_faderCvSeqG_Channel, 4, TAG_DONE),
+																	Child, tmp.FG[5] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[5], MUIA_faderCvSeqG_Channel, 5, TAG_DONE),
+																	Child, tmp.FG[6] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[6], MUIA_faderCvSeqG_Channel, 6, TAG_DONE),
+																	Child, tmp.FG[7] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[7], MUIA_faderCvSeqG_Channel, 7, TAG_DONE),
+																	Child, tmp.FG[8] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[8], MUIA_faderCvSeqG_Channel, 8, TAG_DONE),
+																	Child, tmp.FG[9] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[9], MUIA_faderCvSeqG_Channel, 9, TAG_DONE),
+																	Child, tmp.FG[10] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[10], MUIA_faderCvSeqG_Channel, 10, TAG_DONE),
+																	Child, tmp.FG[11] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[11], MUIA_faderCvSeqG_Channel, 11, TAG_DONE),
+																	Child, tmp.FG[12] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[12], MUIA_faderCvSeqG_Channel, 12, TAG_DONE),
+																	Child, tmp.FG[13] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[13], MUIA_faderCvSeqG_Channel, 13, TAG_DONE),
+																	Child, tmp.FG[14] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[14], MUIA_faderCvSeqG_Channel, 14, TAG_DONE),
+																	Child, tmp.FG[15] = NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[15], MUIA_faderCvSeqG_Channel, 15, TAG_DONE),
 																End,
 															End,
 								TAG_MORE, msg->ops_AttrList);
@@ -254,6 +254,20 @@ ULONG modifierW_Offset(struct IClass *cl, Object *obj, struct MUIP_modifierW_SL_
 }
 
 /*-----------------------------------------------------------------------------
+- modifierW_Update
+------------------------------------------------------------------------------*/
+ULONG modifierW_Update(struct IClass *cl, Object *obj, Msg msg)
+{
+	int i;
+	struct modifierW_Data *data = INST_DATA(cl, obj);
+
+	for (i = 0; i < 16; i++)
+		DoMethod(data->FG[i], MUIM_faderCvSeqG_Update);
+
+	return 0;
+}
+
+/*-----------------------------------------------------------------------------
 - Dispatcher
 ------------------------------------------------------------------------------*/
 DISPATCHER(modifierW_Dispatcher)
@@ -270,6 +284,8 @@ DISPATCHER(modifierW_Dispatcher)
 			return modifierW_Speed(cl, obj, (APTR)msg);
 		case MUIM_modifierW_Offset:
 			return modifierW_Offset(cl, obj, (APTR)msg);
+		case MUIM_modifierW_Update:
+			return modifierW_Update(cl, obj, (APTR)msg);
 	}
 
 	return DoSuperMethodA(cl, obj, msg);

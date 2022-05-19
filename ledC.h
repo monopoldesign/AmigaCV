@@ -35,6 +35,10 @@ DISPATCHER(ledC_Dispatcher);
 *******************************************************************************/
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
 
+#define MUIM_ledC_Update	TAGBASE_CLASS + 2
+
+#define MUIA_ledC_Channel	TAGBASE_CLASS + 1
+
 struct ledC_Data
 {
 	ULONG chn;

@@ -18,6 +18,7 @@
 *******************************************************************************/
 #include "main.h"
 #include "faderCvSeqG.h"
+#include "ledC.h"
 #include "help.h"
 
 /******************************************************************************
@@ -68,7 +69,7 @@ ULONG faderCvSeqG_New(struct IClass *cl, Object *obj, struct opSet *msg)
 					MUIA_Background, MUII_TextBack,
 					MUIA_Frame, MUIV_Frame_Text,
 				End,
-				Child, NewObject(CL_ledC->mcc_Class, NULL, MUIA_Frame, MUIV_Frame_Gauge, TAG_DONE),
+				Child, tmp.led = NewObject(CL_ledC->mcc_Class, NULL, MUIA_ledC_Channel, tmp.chn, MUIA_Frame, MUIV_Frame_Gauge, TAG_DONE),
 			End));
 	{
 		struct faderCvSeqG_Data *data = INST_DATA(cl, obj);
@@ -100,6 +101,17 @@ ULONG faderCvSeqG_Slider(struct IClass *cl, Object *obj, struct MUIP_faderCvSeqG
 }
 
 /*-----------------------------------------------------------------------------
+- faderCvSeqG_Slider
+------------------------------------------------------------------------------*/
+ULONG faderCvSeqG_Update(struct IClass *cl, Object *obj, Msg msg)
+{
+	struct faderCvSeqG_Data *data = INST_DATA(cl, obj);
+
+	DoMethod(data->led, MUIM_ledC_Update);
+	return 0;
+}
+
+/*-----------------------------------------------------------------------------
 - Dispatcher
 ------------------------------------------------------------------------------*/
 DISPATCHER(faderCvSeqG_Dispatcher)
@@ -110,6 +122,8 @@ DISPATCHER(faderCvSeqG_Dispatcher)
 			return faderCvSeqG_New(cl, obj, (APTR)msg);
 		case MUIM_faderCvSeqG_Slider:
 			return faderCvSeqG_Slider(cl, obj, (APTR)msg);
+		case MUIM_faderCvSeqG_Update:
+			return faderCvSeqG_Update(cl, obj, (APTR)msg);
 	}
 
 	return DoSuperMethodA(cl, obj, msg);

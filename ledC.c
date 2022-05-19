@@ -33,7 +33,7 @@ ULONG ledC_New(struct IClass *cl, Object *obj, struct opSet *msg)
 	struct TagItem *tags;
 
 	tags = msg->ops_AttrList;
-	//tmp.chn = (UBYTE)GetTagData(MUIA_lfoC_Channel, 0, tags);
+	tmp.chn = (UBYTE)GetTagData(MUIA_ledC_Channel, 0, tags);
 
 	if (obj = (Object *)DoSuperMethodA(cl, obj, (APTR)msg))
 	{
@@ -72,7 +72,28 @@ ULONG ledC_mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 
 	DoSuperMethodA(cl, obj, (Msg)msg);
 
-	SetAPen(_rp(obj), _dri(obj)->dri_Pens[FILLPEN]);
+	SetAPen(_rp(obj), _dri(obj)->dri_Pens[TEXTPEN]);
+
+	if (seqPos[0] == data->chn)
+		SetAPen(_rp(obj), _dri(obj)->dri_Pens[FILLPEN]);
+
+	RectFill(_rp(obj), _mleft(obj), _mtop(obj), _mright(obj), _mbottom(obj));
+
+	return (0);
+}
+
+/*-----------------------------------------------------------------------------
+- Draw-Method
+------------------------------------------------------------------------------*/
+ULONG ledC_mUpdate(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
+{
+	struct ledC_Data *data = INST_DATA(cl, obj);
+
+	SetAPen(_rp(obj), _dri(obj)->dri_Pens[TEXTPEN]);
+
+	if (seqPos[0] == data->chn)
+		SetAPen(_rp(obj), _dri(obj)->dri_Pens[FILLPEN]);
+
 	RectFill(_rp(obj), _mleft(obj), _mtop(obj), _mright(obj), _mbottom(obj));
 
 	return (0);
@@ -89,10 +110,13 @@ DISPATCHER(ledC_Dispatcher)
 			return ledC_New(cl, obj, (APTR)msg);
 
 		case MUIM_AskMinMax:
-			return (ledC_mAskMinMax(cl, obj, (APTR)msg));
+			return ledC_mAskMinMax(cl, obj, (APTR)msg);
 
 		case MUIM_Draw:
-			return (ledC_mDraw(cl, obj, (APTR)msg));
+			return ledC_mDraw(cl, obj, (APTR)msg);
+
+		case MUIM_ledC_Update:
+			return ledC_mUpdate(cl, obj, (APTR)msg);
 	}
 
 	return (DoSuperMethodA(cl, obj, msg));
