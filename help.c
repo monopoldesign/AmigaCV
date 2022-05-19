@@ -24,7 +24,9 @@
 #include "modifierW.h"
 #include "faderG.h"
 #include "matrixG.h"
+#include "faderCvSeqG.h"
 #include "lfoC.h"
+#include "ledC.h"
 #include "help.h"
 
 /******************************************************************************
@@ -86,10 +88,12 @@ BOOL initClasses(void)
 
 	CL_faderG = MUI_CreateCustomClass(NULL, MUIC_Group, NULL, sizeof(struct faderG_Data), faderG_Dispatcher);
 	CL_matrixG = MUI_CreateCustomClass(NULL, MUIC_Group, NULL, sizeof(struct matrixG_Data), matrixG_Dispatcher);
+	CL_faderCvSeqG = MUI_CreateCustomClass(NULL, MUIC_Group, NULL, sizeof(struct faderCvSeqG_Data), faderCvSeqG_Dispatcher);
 
 	CL_lfoC = MUI_CreateCustomClass(NULL, MUIC_Area, NULL, sizeof(struct lfoC_Data), lfoC_Dispatcher);
+	CL_ledC = MUI_CreateCustomClass(NULL, MUIC_Area, NULL, sizeof(struct ledC_Data), ledC_Dispatcher);
 
-	if (CL_ctrlW && CL_inputW && CL_outputW && CL_matrixW && CL_modifierW && CL_faderG && CL_matrixG && CL_lfoC)
+	if (CL_ctrlW && CL_inputW && CL_outputW && CL_matrixW && CL_modifierW && CL_faderG && CL_matrixG && CL_faderCvSeqG && CL_lfoC && CL_ledC)
 		return TRUE;
 
 	exitClasses();
@@ -122,8 +126,14 @@ void exitClasses(void)
 	if (CL_matrixG)
 		MUI_DeleteCustomClass(CL_matrixG);
 
+	if (CL_faderCvSeqG)
+		MUI_DeleteCustomClass(CL_faderCvSeqG);
+
 	if (CL_lfoC)
 		MUI_DeleteCustomClass(CL_lfoC);
+
+	if (CL_ledC)
+		MUI_DeleteCustomClass(CL_ledC);
 }
 
 /*-----------------------------------------------------------------------------

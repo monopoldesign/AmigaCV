@@ -54,7 +54,7 @@ void lfoTask();
 *******************************************************************************/
 #define MAKE_ID(a, b, c, d) ((ULONG)(a) << 24 | (ULONG)(b) << 16 | (ULONG)(c) << 8 | (ULONG)(d))
 
-enum MODTYPE {MOD_LFO, MOD_DC};
+enum MODTYPE {MOD_LFO, MOD_CVSEQ, MOD_DC};
 
 /******************************************************************************
 * Global Variables
@@ -77,16 +77,20 @@ extern struct MUI_CustomClass *CL_matrixW;
 extern struct MUI_CustomClass *CL_modifierW;
 extern struct MUI_CustomClass *CL_faderG;
 extern struct MUI_CustomClass *CL_matrixG;
+extern struct MUI_CustomClass *CL_faderCvSeqG;
 extern struct MUI_CustomClass *CL_lfoC;
+extern struct MUI_CustomClass *CL_ledC;
 
 extern Object *myLFO[8];
-extern volatile UBYTE phaseCnt[8];
+extern volatile ULONG phaseCnt[8];
 extern volatile ULONG sampleCnt[8];
 extern volatile BYTE LFOVal[8];
 
 extern UBYTE LFOWave[8];
 extern UBYTE LFOSpeed[8];
 extern BYTE LFOOffset[8];
+
+extern BYTE CVSeq[16];
 
 extern ULONG tempo;
 extern BOOL isPlaying;

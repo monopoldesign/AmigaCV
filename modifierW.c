@@ -19,6 +19,7 @@
 #include "main.h"
 #include "modifierW.h"
 #include "lfoC.h"
+#include "faderCvSeqG.h"
 #include "help.h"
 
 char winTitle[32 * 8];
@@ -85,6 +86,76 @@ ULONG modifierW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 																	End,
 																End,
 																Child, myLFO[tmp.chn] = NewObject(CL_lfoC->mcc_Class, NULL, MUIA_lfoC_Channel, tmp.chn, TextFrame, MUIA_Background, MUII_BACKGROUND, TAG_DONE),
+															End,
+								TAG_MORE, msg->ops_AttrList);
+			break;
+
+		case MOD_CVSEQ:
+			sprintf(winTitle + (32 * tmp.chn), "MOD_CVSEQ - Channel %d", tmp.chn + 1);
+			obj = (Object *)DoSuperNew(cl, obj,
+								MUIA_Window_Title,			winTitle + (32 * tmp.chn),
+								MUIA_Window_TopEdge,		220,
+								MUIA_Window_LeftEdge,		20,
+								MUIA_Window_Screen,			myScreen,
+								MUIA_Window_SizeGadget,		FALSE,
+								MUIA_Window_DepthGadget,	FALSE,
+								WindowContents,				HGroup,
+																/*
+																Child, HGroup,
+																	Child, VGroup,
+																		Child, Label("Prescale:"),
+																		Child, RectangleObject,
+																			MUIA_FixHeight, 3,
+																		End,
+																		Child, Label("First:"),
+																		Child, RectangleObject,
+																			MUIA_FixHeight, 3,
+																		End,
+																		Child, Label("Last:"),
+																	End,
+																	Child, VGroup,
+																		Child, StringObject,
+																			MUIA_FixWidth, 20,
+																			MUIA_Frame, MUIV_Frame_String,
+																			MUIA_String_Accept, "0123456789",
+																			MUIA_String_MaxLen, 3,
+																			MUIA_String_Format, MUIV_String_Format_Center,
+																		End,
+																		Child, StringObject,
+																			MUIA_FixWidth, 20,
+																			MUIA_Frame, MUIV_Frame_String,
+																			MUIA_String_Accept, "0123456789",
+																			MUIA_String_MaxLen, 3,
+																			MUIA_String_Format, MUIV_String_Format_Center,
+																		End,
+																		Child, StringObject,
+																			MUIA_FixWidth, 20,
+																			MUIA_Frame, MUIV_Frame_String,
+																			MUIA_String_Accept, "0123456789",
+																			MUIA_String_MaxLen, 3,
+																			MUIA_String_Format, MUIV_String_Format_Center,
+																		End,
+																	End,
+																End,
+																*/
+																Child, HGroup,
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[0], MUIA_faderCvSeqG_Channel, 0, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[1], MUIA_faderCvSeqG_Channel, 1, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[2], MUIA_faderCvSeqG_Channel, 2, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[3], MUIA_faderCvSeqG_Channel, 3, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[4], MUIA_faderCvSeqG_Channel, 4, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[5], MUIA_faderCvSeqG_Channel, 5, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[6], MUIA_faderCvSeqG_Channel, 6, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[7], MUIA_faderCvSeqG_Channel, 7, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[8], MUIA_faderCvSeqG_Channel, 8, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[9], MUIA_faderCvSeqG_Channel, 9, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[10], MUIA_faderCvSeqG_Channel, 10, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[11], MUIA_faderCvSeqG_Channel, 11, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[12], MUIA_faderCvSeqG_Channel, 12, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[13], MUIA_faderCvSeqG_Channel, 13, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[14], MUIA_faderCvSeqG_Channel, 14, TAG_DONE),
+																	Child, NewObject(CL_faderCvSeqG->mcc_Class, NULL, MUIA_faderCvSeqG_Dest, &CVSeq[15], MUIA_faderCvSeqG_Channel, 15, TAG_DONE),
+																End,
 															End,
 								TAG_MORE, msg->ops_AttrList);
 			break;

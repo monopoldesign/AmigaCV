@@ -41,7 +41,9 @@ struct MUI_CustomClass *CL_matrixW;
 struct MUI_CustomClass *CL_modifierW;
 struct MUI_CustomClass *CL_faderG;
 struct MUI_CustomClass *CL_matrixG;
+struct MUI_CustomClass *CL_faderCvSeqG;
 struct MUI_CustomClass *CL_lfoC;
+struct MUI_CustomClass *CL_ledC;
 
 #define STACK_SIZE 1000L
 struct Task *lfoTaskPtr = NULL;
@@ -53,13 +55,15 @@ struct MsgPort *TimerMP;
 struct timerequest *TimerIO;
 
 Object *myLFO[8];
-volatile UBYTE phaseCnt[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+volatile ULONG phaseCnt[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 volatile ULONG sampleCnt[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 volatile BYTE LFOVal[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 UBYTE LFOWave[8] = {0, 0, 1, 1, 2, 2, 3, 3};
 UBYTE LFOSpeed[8] = {8, 8, 16, 16, 32, 32, 64, 64};
 BYTE LFOOffset[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+BYTE CVSeq[16] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 85, 90, 95, 100, 105, 110, 115};
 
 unsigned int dispCnt = 0;
 
@@ -69,7 +73,7 @@ BOOL isPlaying = FALSE;
 UBYTE AudioIn[8] = {0, 10, 20, 30, 40, 50, 60, 70};
 UBYTE AudioOut[8] = {70, 60, 50, 40, 30, 20, 10, 0};
 UBYTE CVin[8] = {1, 2, 4, 8, 16, 32, 64, 128};
-UBYTE modType[8] = {MOD_LFO, MOD_DC, MOD_LFO, MOD_DC, MOD_LFO, MOD_DC, MOD_LFO, MOD_DC};
+UBYTE modType[8] = {MOD_LFO, MOD_CVSEQ, MOD_LFO, MOD_DC, MOD_LFO, MOD_DC, MOD_LFO, MOD_DC};
 
 /******************************************************************************
 s* Main-Program
@@ -248,6 +252,9 @@ void lfoTask()
 						{
 							sampleCnt[i] = 0;
 							phaseCnt[i]++;
+
+							if (phaseCnt[i] > 255)
+								phaseCnt[i] = 0;
 						}
 						else
 							sampleCnt[i]++;
