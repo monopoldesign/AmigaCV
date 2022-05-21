@@ -50,35 +50,42 @@ struct MUI_CustomClass *CL_ledC;
 
 #define STACK_SIZE 1000L
 struct Task *lfoTaskPtr = NULL;
-struct Task *seqTaskPtr = NULL;
+struct Task *dispTaskPtr = NULL;
 
 volatile UBYTE lfoTaskRunning = FALSE;
 volatile UBYTE lfoTaskRemove = FALSE;
-volatile UBYTE seqTaskRunning = FALSE;
-volatile UBYTE seqTaskRemove = FALSE;
-
-Object *myLFO[8];
-volatile ULONG phaseCnt[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-volatile ULONG sampleCnt[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-volatile BYTE LFOVal[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+volatile UBYTE dispTaskRunning = FALSE;
+volatile UBYTE dispTaskRemove = FALSE;
 
 UBYTE LFOWave[8] = {0, 0, 1, 1, 2, 2, 3, 3};
 UBYTE LFOSpeed[8] = {8, 8, 16, 16, 32, 32, 64, 64};
 BYTE LFOOffset[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 UBYTE CVSeq[16] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 85, 90, 95, 100, 105, 110, 115};
-UBYTE seqPos[8] = {4, 0, 0, 0, 0, 0, 0, 0};
-UBYTE seqPrescale[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-unsigned int dispCnt = 0;
-
-ULONG tempo = 40;
+ULONG tempo = 120;
 BOOL isPlaying = FALSE;
 
 UBYTE AudioIn[8] = {0, 10, 20, 30, 40, 50, 60, 70};
 UBYTE AudioOut[8] = {70, 60, 50, 40, 30, 20, 10, 0};
 UBYTE CVin[8] = {1, 2, 4, 8, 16, 32, 64, 128};
 UBYTE modType[8] = {MOD_LFO, MOD_CVSEQ, MOD_LFO, MOD_DC, MOD_LFO, MOD_DC, MOD_LFO, MOD_DC};
+
+#define OFF	0
+#define ON	1
+#define	STOPPED 2
+
+struct TSIData *tsidata;
+
+struct MsgPort *intPort;
+struct Interrupt *softInt;
+struct timerequest *int_tr;
+
+struct TSIData2 *tsidata2;
+
+struct MsgPort *intPort2;
+struct Interrupt *softInt2;
+struct timerequest *int_tr2;
 
 /******************************************************************************
 s* Main-Program
@@ -89,6 +96,22 @@ s* Main-Program
 ------------------------------------------------------------------------------*/
 int main(int argc, char *argv[])
 {
+	/*
+	if (addInterrupt())
+	{
+		printf("starting softint. CTRL-C to break...\n");
+
+		while(1)
+		{
+			Wait(SIGBREAKF_CTRL_C);
+			break;
+		}
+
+		endInterrupt();
+	}
+	exit(0);
+	*/
+
 	if (initLibs())
 	{
 		if (SetupScreen())
@@ -127,19 +150,21 @@ int main(int argc, char *argv[])
 					DoMethod(app, OM_ADDMEMBER, matrixWin);
 					set(matrixWin, MUIA_Window_Open, TRUE);
 
-					if (addLfoTask())
+					if (addDispTask())
 					{
-						if (addSeqTask())
+						if (addInterrupt())
 						{
-							// Application Main-Loop
-							mainLoop();
-
-							if (seqTaskRunning)
-								remSeqTask();
+							if (addInterrupt2())
+							{
+								// Application Main-Loop
+								mainLoop();
+								endInterrupt2();
+							}
+							endInterrupt();
 						}
 
-						if (lfoTaskRunning)
-							remLfoTask();
+						if (dispTaskRunning)
+							remDispTask();
 					}
 
 					// close Matrix-Window
@@ -206,13 +231,13 @@ void mainLoop()
 }
 
 /*-----------------------------------------------------------------------------
-- addLfoTask()
+- addDispTask()
 ------------------------------------------------------------------------------*/
-BOOL addLfoTask()
+BOOL addDispTask()
 {
-	if (!lfoTaskRunning)
+	if (!dispTaskRunning)
 	{
-		if (lfoTaskPtr = CreateTask("LFOTask", 0, lfoTask, STACK_SIZE))
+		if (dispTaskPtr = CreateTask("DispTask", 0, dispTask, STACK_SIZE))
 			return TRUE;
 	}
 
@@ -220,26 +245,26 @@ BOOL addLfoTask()
 }
 
 /*-----------------------------------------------------------------------------
-- remLfoTask()
+- remDispTask()
 ------------------------------------------------------------------------------*/
-void remLfoTask()
+void remDispTask()
 {
-	if (lfoTaskRunning)
+	if (dispTaskRunning)
 	{
-		lfoTaskRemove = TRUE;
-		while (lfoTaskRunning);
+		dispTaskRemove = TRUE;
+		while (dispTaskRunning);
 
-		lfoTaskRemove = FALSE;
+		dispTaskRemove = FALSE;
 		Forbid();
-		DeleteTask(lfoTaskPtr);
+		DeleteTask(dispTaskPtr);
 		Permit();
 	}
 }
 
 /*-----------------------------------------------------------------------------
-- lfoTask()
+- dispTask()
 ------------------------------------------------------------------------------*/
-void lfoTask()
+void dispTask()
 {
 	struct MsgPort *TimerMP_Task;
 	struct timerequest *TimerIO_Task;
@@ -251,44 +276,22 @@ void lfoTask()
 		{
 			if (!(OpenDevice(TIMERNAME, UNIT_MICROHZ, (struct IORequest *)TimerIO_Task, 0)))
 			{
-				lfoTaskRunning = TRUE;
+				dispTaskRunning = TRUE;
 
 				while (1)
 				{
 					for (i = 0; i < 8; i++)
 					{
-						//LFOVal[i] = sineWave[phaseCnt[i]];
-
-						if (sampleCnt[i] >= LFOSpeed[i])
-						{
-							sampleCnt[i] = 0;
-							phaseCnt[i]++;
-
-							if (phaseCnt[i] > 255)
-								phaseCnt[i] = 0;
-						}
-						else
-							sampleCnt[i]++;
-					}
-
-					dispCnt++;
-					if (dispCnt >= 200)		// 200 * 200us = 25Hz
-					{
-						dispCnt = 0;
-
-						for (i = 0; i < 8; i++)
-						{
-							if (myLFO[i])
-								DoMethod(myLFO[i], MUIM_lfoC_Update);
-						}
+						if (xget(modifierW[i], MUIA_Window_Open))
+							DoMethod(modifierW[i], MUIM_modifierW_Update);
 					}
 
 					TimerIO_Task->tr_node.io_Command = TR_ADDREQUEST;
 					TimerIO_Task->tr_time.tv_secs = 0;
-					TimerIO_Task->tr_time.tv_micro = 2 * 100;
+					TimerIO_Task->tr_time.tv_micro = 40 * 1000;
 					DoIO((struct IORequest *)TimerIO_Task);
 
-					if (lfoTaskRemove)
+					if (dispTaskRemove)
 						break;
 				}
 
@@ -299,101 +302,205 @@ void lfoTask()
 		DeletePort(TimerMP_Task);
 	}
 
-	lfoTaskRunning = FALSE;
+	dispTaskRunning = FALSE;
 	Wait(0L);
 }
 
-/*-----------------------------------------------------------------------------
-- addSeqTask()
-------------------------------------------------------------------------------*/
-BOOL addSeqTask()
+BOOL addInterrupt(void)
 {
-	if (!seqTaskRunning)
+	if (tsidata = AllocVec(sizeof(struct TSIData), MEMF_PUBLIC|MEMF_CLEAR))
 	{
-		if (lfoTaskPtr = CreateTask("SeqTask", 0, seqTask, STACK_SIZE))
-			return TRUE;
-	}
+		if (intPort = AllocVec(sizeof(struct MsgPort), MEMF_PUBLIC|MEMF_CLEAR))
+		{
+			NewList(&(intPort->mp_MsgList));
 
+			if (softInt = AllocVec(sizeof(struct Interrupt), MEMF_PUBLIC|MEMF_CLEAR))
+			{
+				softInt->is_Code = (APTR)tsoftcode;
+				softInt->is_Data = tsidata;
+				softInt->is_Node.ln_Pri = 0;
+
+				intPort->mp_Node.ln_Type = NT_MSGPORT;
+				intPort->mp_Flags = PA_SOFTINT;
+				intPort->mp_SigTask = (struct Task *)softInt;
+
+				if (int_tr = (struct timerequest *)CreateExtIO(intPort, sizeof(struct timerequest)))
+				{
+					if (!(OpenDevice(TIMERNAME, UNIT_MICROHZ, (struct IORequest *)int_tr, 0)))
+					{
+						tsidata->tsi_Flag = ON;
+						tsidata->tsi_Port = intPort;
+						tsidata->tsi_Counter = 0;
+
+						int_tr->tr_node.io_Command = TR_ADDREQUEST;
+						int_tr->tr_time.tv_secs = 0;
+						int_tr->tr_time.tv_micro = tempoTab[tempo - 20];
+						BeginIO((struct IORequest *)int_tr);
+
+						return TRUE;
+					}
+					DeleteExtIO((struct IORequest *)int_tr);
+				}
+				FreeVec(softInt);
+			}
+			FreeVec(intPort);
+		}
+		FreeVec(tsidata);
+	}
 	return FALSE;
 }
 
-/*-----------------------------------------------------------------------------
-- remSeqTask()
-------------------------------------------------------------------------------*/
-void remSeqTask()
+void endInterrupt(void)
 {
-	if (seqTaskRunning)
-	{
-		seqTaskRemove = TRUE;
-		while (seqTaskRunning);
+	tsidata->tsi_Flag = OFF;
+	while (tsidata->tsi_Flag != STOPPED);
 
-		seqTaskRemove = FALSE;
-		Forbid();
-		DeleteTask(lfoTaskPtr);
-		Permit();
-	}
+	if (int_tr)
+		CloseDevice((struct IORequest *)int_tr);
+
+	if (int_tr)
+		DeleteExtIO((struct IORequest *)int_tr);
+
+	if (softInt)
+		FreeVec(softInt);
+
+	if (intPort)
+		FreeVec(intPort);
+
+	if (tsidata)
+		FreeVec(tsidata);
 }
 
-/*-----------------------------------------------------------------------------
-- seqTask()
-------------------------------------------------------------------------------*/
-void seqTask()
+void tsoftcode(void)
 {
-	struct MsgPort *TimerMP_Task;
-	struct timerequest *TimerIO_Task;
-	int i;
+	struct timerequest *tr;
+	UBYTE i;
 
-	if (TimerMP_Task = CreatePort(0, 0))
+	tr = (struct timerequest *)GetMsg(tsidata->tsi_Port);
+
+	if ((tr) && (tsidata->tsi_Flag == ON))
 	{
-		if (TimerIO_Task = (struct timerequest *)CreateExtIO(TimerMP_Task, sizeof(struct timerequest)))
+		tsidata->tsi_Counter++;
+
+		for (i = 0; i < 8; i++)
 		{
-			if (!(OpenDevice(TIMERNAME, UNIT_MICROHZ, (struct IORequest *)TimerIO_Task, 0)))
+			tsidata->seqPrescale[i]++;
+			if (tsidata->seqPrescale[i] == 6)
 			{
-				seqTaskRunning = TRUE;
+				tsidata->seqPrescale[i] = 0;
 
-				while (1)
-				{
-					for (i = 0; i < 8; i++)
-					{
-						seqPrescale[i]++;
-						if (seqPrescale[i] == 6)
-						{
-							seqPrescale[i] = 0;
-
-							seqPos[i]++;
-							if (seqPos[i] > 15)
-								seqPos[i] = 0;
-						}
-					}
-
-					dispCnt++;
-					if (dispCnt >= 100)		// 200 * 200us = 25Hz
-					{
-						dispCnt = 0;
-
-						for (i = 0; i < 8; i++)
-						{
-							if (modifierW[i])
-								DoMethod(modifierW[i], MUIM_modifierW_Update);
-						}
-					}
-
-					TimerIO_Task->tr_node.io_Command = TR_ADDREQUEST;
-					TimerIO_Task->tr_time.tv_secs = 0;
-					TimerIO_Task->tr_time.tv_micro = tempoTab[tempo - 20];
-					DoIO((struct IORequest *)TimerIO_Task);
-
-					if (seqTaskRemove)
-						break;
-				}
-
-				CloseDevice((struct IORequest *)TimerIO_Task);
+				tsidata->seqPos[i]++;
+				if (tsidata->seqPos[i] > 15)
+					tsidata->seqPos[i] = 0;
 			}
-			DeleteExtIO((struct IORequest *)TimerIO_Task);
 		}
-		DeletePort(TimerMP_Task);
-	}
 
-	seqTaskRunning = FALSE;
-	Wait(0L);
+		int_tr->tr_node.io_Command = TR_ADDREQUEST;
+		int_tr->tr_time.tv_secs = 0;
+		int_tr->tr_time.tv_micro = tempoTab[tempo - 20];
+		BeginIO((struct IORequest *)tr);
+	}
+	else
+		tsidata->tsi_Flag = STOPPED;
+}
+
+BOOL addInterrupt2(void)
+{
+	if (tsidata2 = AllocVec(sizeof(struct TSIData2), MEMF_PUBLIC|MEMF_CLEAR))
+	{
+		if (intPort2 = AllocVec(sizeof(struct MsgPort), MEMF_PUBLIC|MEMF_CLEAR))
+		{
+			NewList(&(intPort2->mp_MsgList));
+
+			if (softInt2 = AllocVec(sizeof(struct Interrupt), MEMF_PUBLIC|MEMF_CLEAR))
+			{
+				softInt2->is_Code = (APTR)tsoftcode2;
+				softInt2->is_Data = tsidata2;
+				softInt2->is_Node.ln_Pri = 0;
+
+				intPort2->mp_Node.ln_Type = NT_MSGPORT;
+				intPort2->mp_Flags = PA_SOFTINT;
+				intPort2->mp_SigTask = (struct Task *)softInt2;
+
+				if (int_tr2 = (struct timerequest *)CreateExtIO(intPort2, sizeof(struct timerequest)))
+				{
+					if (!(OpenDevice(TIMERNAME, UNIT_MICROHZ, (struct IORequest *)int_tr2, 0)))
+					{
+						tsidata2->tsi_Flag = ON;
+						tsidata2->tsi_Port = intPort2;
+						tsidata2->tsi_Counter = 0;
+
+						int_tr2->tr_node.io_Command = TR_ADDREQUEST;
+						int_tr2->tr_time.tv_secs = 0;
+						int_tr2->tr_time.tv_micro = 2 * 100;
+						BeginIO((struct IORequest *)int_tr2);
+
+						return TRUE;
+					}
+					DeleteExtIO((struct IORequest *)int_tr2);
+				}
+				FreeVec(softInt2);
+			}
+			FreeVec(intPort2);
+		}
+		FreeVec(tsidata2);
+	}
+	return FALSE;
+}
+
+void endInterrupt2(void)
+{
+	tsidata2->tsi_Flag = OFF;
+	while (tsidata2->tsi_Flag != STOPPED);
+
+	if (int_tr2)
+		CloseDevice((struct IORequest *)int_tr2);
+
+	if (int_tr2)
+		DeleteExtIO((struct IORequest *)int_tr2);
+
+	if (softInt2)
+		FreeVec(softInt2);
+
+	if (intPort2)
+		FreeVec(intPort2);
+
+	if (tsidata2)
+		FreeVec(tsidata2);
+}
+
+void tsoftcode2(void)
+{
+	struct timerequest *tr;
+	UBYTE i;
+
+	tr = (struct timerequest *)GetMsg(tsidata2->tsi_Port);
+
+	if ((tr) && (tsidata2->tsi_Flag == ON))
+	{
+		tsidata2->tsi_Counter++;
+
+		for (i = 0; i < 8; i++)
+		{
+			//LFOVal[i] = sineWave[phaseCnt[i]];
+
+			if (tsidata2->sampleCnt[i] >= LFOSpeed[i])
+			{
+				tsidata2->sampleCnt[i] = 0;
+				tsidata2->phaseCnt[i]++;
+
+				if (tsidata2->phaseCnt[i] > 255)
+					tsidata2->phaseCnt[i] = 0;
+			}
+			else
+				tsidata2->sampleCnt[i]++;
+		}
+
+		int_tr2->tr_node.io_Command = TR_ADDREQUEST;
+		int_tr2->tr_time.tv_secs = 0;
+		int_tr2->tr_time.tv_micro = 2 * 100;
+		BeginIO((struct IORequest *)tr);
+	}
+	else
+		tsidata2->tsi_Flag = STOPPED;
 }

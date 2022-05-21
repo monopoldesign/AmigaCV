@@ -25,9 +25,10 @@
 * Prototypes
 *******************************************************************************/
 ULONG lfoC_New(struct IClass *cl, Object *obj, struct opSet *msg);
+ULONG lfoC_mSet(struct IClass *cl, Object *obj, struct opSet *msg);
 ULONG lfoC_mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg);
 ULONG lfoC_mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg);
-ULONG lfoC_mUpdate(struct IClass *cl, Object *obj, struct MUIP_Draw *msg);
+
 int lfoC_transformX(Object *obj, int x);
 int lfoC_transformY(Object *obj, int y);
 DISPATCHER(lfoC_Dispatcher);
@@ -38,11 +39,12 @@ DISPATCHER(lfoC_Dispatcher);
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
 
 #define MUIA_lfoC_Channel 	TAGBASE_CLASS + 1
-#define MUIM_lfoC_Update	TAGBASE_CLASS + 1
+#define MUIA_lfoC_Phase 	TAGBASE_CLASS + 2
 
 struct lfoC_Data
 {
 	ULONG chn;
+	UBYTE phase;
 	UBYTE oldPhase;
 };
 

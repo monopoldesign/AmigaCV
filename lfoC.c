@@ -40,7 +40,7 @@ const BYTE lfowaves[256 * 4] =
 /*-----------------------------------------------------------------------------
 - OM_NEW
 ------------------------------------------------------------------------------*/
-ULONG lfoC_New(struct IClass *cl, Object *obj, struct opSet *msg)
+ULONG lfoC_mNew(struct IClass *cl, Object *obj, struct opSet *msg)
 {
 	struct lfoC_Data tmp = {0};
 	struct TagItem *tags;
@@ -56,6 +56,22 @@ ULONG lfoC_New(struct IClass *cl, Object *obj, struct opSet *msg)
 	}
 	CoerceMethod(cl, obj, OM_DISPOSE);
 	return 0;
+}
+
+/*-----------------------------------------------------------------------------
+- OM_SET
+------------------------------------------------------------------------------*/
+ULONG lfoC_mSet(struct IClass *cl, Object *obj, struct opSet *msg)
+{
+	struct lfoC_Data *data = INST_DATA(cl, obj);
+	struct TagItem *tags;
+
+	tags = msg->ops_AttrList;
+	data->phase = (UBYTE)GetTagData(MUIA_lfoC_Phase, 0, tags);
+
+	MUI_Redraw(obj, MADF_DRAWUPDATE);
+
+	return DoSuperMethodA(cl, obj, (Msg)msg);
 }
 
 /*-----------------------------------------------------------------------------
@@ -81,10 +97,60 @@ ULONG lfoC_mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg
 ------------------------------------------------------------------------------*/
 ULONG lfoC_mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 {
-	int i, x, y;
+	int i, x, y, start, end;
 	struct lfoC_Data *data = INST_DATA(cl, obj);
 
 	DoSuperMethodA(cl, obj, (Msg)msg);
+
+	if (msg->flags & MADF_DRAWUPDATE)
+	{
+		// Clear Cursor
+		SetAPen(_rp(obj), _dri(obj)->dri_Pens[DETAILPEN]);
+		x = lfoC_transformX(obj, data->oldPhase);
+		Move(_rp(obj), x, _mtop(obj));
+		Draw(_rp(obj), x, _mbottom(obj));
+		
+		// Draw Cursor
+		SetAPen(_rp(obj), _dri(obj)->dri_Pens[FILLPEN]);
+		x = lfoC_transformX(obj, data->phase);
+		Move(_rp(obj), x, _mtop(obj));
+		Draw(_rp(obj), x, _mbottom(obj));
+		
+		if (data->oldPhase < 2)
+		{
+			start = 0;
+			end = 1;
+		}
+		else if (data->oldPhase > 255 - 2)
+		{
+			start = 255 - 2;
+			end = 255;
+		}
+		else
+		{
+			start = data->oldPhase - 2;
+			end = data->oldPhase + 2;
+		}
+		
+		SetAPen(_rp(obj), _dri(obj)->dri_Pens[TEXTPEN]);
+		for (i = start; i < end; i++)
+		{
+			x = lfoC_transformX(obj, i);
+			y = lfoC_transformY(obj, lfowaves[(256 * LFOWave[data->chn]) + i] + LFOOffset[data->chn]);
+		
+			// some clipping
+			if (y < _mtop(obj))
+				y = _mtop(obj);
+		
+			if (y > _mbottom(obj))
+				y = _mbottom(obj);
+		
+			WritePixel(_rp(obj), x, y);
+		}
+		
+		data->oldPhase = data->phase;
+		return 0;
+	}
 
 	// Clear Background
 	SetAPen(_rp(obj), _dri(obj)->dri_Pens[BACKGROUNDPEN]);
@@ -108,66 +174,7 @@ ULONG lfoC_mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 		WritePixel(_rp(obj), x, y);
 	}
 
-	data->oldPhase = phaseCnt[data->chn];
-
-	return (0);
-}
-
-/*-----------------------------------------------------------------------------
-- mUpdate()
-------------------------------------------------------------------------------*/
-ULONG lfoC_mUpdate(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
-{
-	int i, x, y, start, end;
-	struct lfoC_Data *data = INST_DATA(cl, obj);
-
-	DoSuperMethodA(cl, obj, (Msg)msg);
-
-	// Clear Cursor
-	SetAPen(_rp(obj), _dri(obj)->dri_Pens[DETAILPEN]);
-	x = lfoC_transformX(obj, data->oldPhase);
-	Move(_rp(obj), x, _mtop(obj));
-	Draw(_rp(obj), x, _mbottom(obj));
-
-	// Draw Cursor
-	SetAPen(_rp(obj), _dri(obj)->dri_Pens[FILLPEN]);
-	x = lfoC_transformX(obj, phaseCnt[data->chn]);
-	Move(_rp(obj), x, _mtop(obj));
-	Draw(_rp(obj), x, _mbottom(obj));
-
-	if (data->oldPhase < 2)
-	{
-		start = 0;
-		end = 1;
-	}
-	else if (data->oldPhase > 255 - 2)
-	{
-		start = 255 - 2;
-		end = 255;
-	}
-	else
-	{
-		start = data->oldPhase - 2;
-		end = data->oldPhase + 2;
-	}
-
-	SetAPen(_rp(obj), _dri(obj)->dri_Pens[TEXTPEN]);
-	for (i = start; i < end; i++)
-	{
-		x = lfoC_transformX(obj, i);
-		y = lfoC_transformY(obj, lfowaves[(256 * LFOWave[data->chn]) + i] + LFOOffset[data->chn]);
-
-		// some clipping
-		if (y < _mtop(obj))
-			y = _mtop(obj);
-
-		if (y > _mbottom(obj))
-			y = _mbottom(obj);
-
-		WritePixel(_rp(obj), x, y);
-	}
-
-	data->oldPhase = phaseCnt[data->chn];
+	data->oldPhase = data->phase;
 
 	return (0);
 }
@@ -200,16 +207,16 @@ DISPATCHER(lfoC_Dispatcher)
 	switch (msg->MethodID)
 	{
 		case OM_NEW:
-			return lfoC_New(cl, obj, (APTR)msg);
+			return lfoC_mNew(cl, obj, (APTR)msg);
+
+		case OM_SET:
+			return lfoC_mSet(cl, obj, (APTR)msg);
 
 		case MUIM_AskMinMax:
 			return (lfoC_mAskMinMax(cl, obj, (APTR)msg));
 
 		case MUIM_Draw:
-			return (lfoC_mDraw(cl, obj, (APTR)msg));
-
-		case MUIM_lfoC_Update:
-			return (lfoC_mUpdate(cl, obj, (APTR)msg));
+			return (lfoC_mDraw(cl, obj, (struct MUIP_Draw *)msg));
 	}
 
 	return (DoSuperMethodA(cl, obj, msg));

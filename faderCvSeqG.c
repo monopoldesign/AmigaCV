@@ -32,7 +32,7 @@
 /*-----------------------------------------------------------------------------
 - OM_NEW
 ------------------------------------------------------------------------------*/
-ULONG faderCvSeqG_New(struct IClass *cl, Object *obj, struct opSet *msg)
+ULONG faderCvSeqG_mNew(struct IClass *cl, Object *obj, struct opSet *msg)
 {
 	struct faderCvSeqG_Data tmp = {0};
 	struct TagItem *tags;
@@ -88,6 +88,21 @@ ULONG faderCvSeqG_New(struct IClass *cl, Object *obj, struct opSet *msg)
 }
 
 /*-----------------------------------------------------------------------------
+- faderCvSeqG_mSet
+------------------------------------------------------------------------------*/
+ULONG faderCvSeqG_mSet(struct IClass *cl, Object *obj, struct opSet *msg)
+{
+	struct faderCvSeqG_Data *data = INST_DATA(cl, obj);
+	struct TagItem *tags;
+
+	tags = msg->ops_AttrList;
+	data->pos = (UBYTE)GetTagData(MUIA_faderCvSeqG_Position, 0, tags);
+	set(data->led, MUIA_ledC_Position, data->pos);
+
+	return DoSuperMethodA(cl, obj, (Msg)msg);
+}
+
+/*-----------------------------------------------------------------------------
 - faderCvSeqG_Slider
 ------------------------------------------------------------------------------*/
 ULONG faderCvSeqG_Slider(struct IClass *cl, Object *obj, struct MUIP_faderCvSeqG_SL_Level *msg)
@@ -101,17 +116,6 @@ ULONG faderCvSeqG_Slider(struct IClass *cl, Object *obj, struct MUIP_faderCvSeqG
 }
 
 /*-----------------------------------------------------------------------------
-- faderCvSeqG_Slider
-------------------------------------------------------------------------------*/
-ULONG faderCvSeqG_Update(struct IClass *cl, Object *obj, Msg msg)
-{
-	struct faderCvSeqG_Data *data = INST_DATA(cl, obj);
-
-	DoMethod(data->led, MUIM_ledC_Update);
-	return 0;
-}
-
-/*-----------------------------------------------------------------------------
 - Dispatcher
 ------------------------------------------------------------------------------*/
 DISPATCHER(faderCvSeqG_Dispatcher)
@@ -119,11 +123,11 @@ DISPATCHER(faderCvSeqG_Dispatcher)
 	switch(msg->MethodID)
 	{
 		case OM_NEW:
-			return faderCvSeqG_New(cl, obj, (APTR)msg);
+			return faderCvSeqG_mNew(cl, obj, (APTR)msg);
+		case OM_SET:
+			return faderCvSeqG_mSet(cl, obj, (APTR)msg);
 		case MUIM_faderCvSeqG_Slider:
 			return faderCvSeqG_Slider(cl, obj, (APTR)msg);
-		case MUIM_faderCvSeqG_Update:
-			return faderCvSeqG_Update(cl, obj, (APTR)msg);
 	}
 
 	return DoSuperMethodA(cl, obj, msg);

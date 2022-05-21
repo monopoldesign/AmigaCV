@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <exec/interrupts.h>
 #include <exec/memory.h>
 #include <libraries/mui.h>
 #include <proto/exec.h>
@@ -45,13 +46,17 @@
 int main(int argc, char *argv[]);
 void mainLoop();
 
-BOOL addLfoTask();
-void remLfoTask();
-void lfoTask();
+BOOL addDispTask();
+void remDispTask();
+void dispTask();
 
-BOOL addSeqTask();
-void remSeqTask();
-void seqTask();
+BOOL addInterrupt(void);
+void endInterrupt(void);
+void tsoftcode(void);
+
+BOOL addInterrupt2(void);
+void endInterrupt2(void);
+void tsoftcode2(void);
 
 /******************************************************************************
 * Definitions
@@ -59,6 +64,25 @@ void seqTask();
 #define MAKE_ID(a, b, c, d) ((ULONG)(a) << 24 | (ULONG)(b) << 16 | (ULONG)(c) << 8 | (ULONG)(d))
 
 enum MODTYPE {MOD_LFO, MOD_CVSEQ, MOD_DC};
+
+struct TSIData
+{
+	ULONG tsi_Counter;
+	ULONG tsi_Flag;
+	UBYTE seqPos[8];
+	UBYTE seqPrescale[8];
+	struct MsgPort *tsi_Port;
+};
+
+struct TSIData2
+{
+	ULONG tsi_Counter;
+	ULONG tsi_Flag;
+	struct MsgPort *tsi_Port;
+	ULONG phaseCnt[8];
+	ULONG sampleCnt[8];
+	BYTE LFOVal[8];
+};
 
 /******************************************************************************
 * Global Variables
@@ -85,17 +109,11 @@ extern struct MUI_CustomClass *CL_faderCvSeqG;
 extern struct MUI_CustomClass *CL_lfoC;
 extern struct MUI_CustomClass *CL_ledC;
 
-extern Object *myLFO[8];
-extern volatile ULONG phaseCnt[8];
-extern volatile ULONG sampleCnt[8];
-extern volatile BYTE LFOVal[8];
-
 extern UBYTE LFOWave[8];
 extern UBYTE LFOSpeed[8];
 extern BYTE LFOOffset[8];
 
 extern UBYTE CVSeq[16];
-extern UBYTE seqPos[8];
 
 extern ULONG tempo;
 extern BOOL isPlaying;
@@ -104,5 +122,8 @@ extern UBYTE AudioIn[8];
 extern UBYTE AudioOut[8];
 extern UBYTE CVin[8];
 extern UBYTE modType[8];
+
+extern struct TSIData *tsidata;
+extern struct TSIData2 *tsidata2;
 
 #endif

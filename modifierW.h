@@ -43,7 +43,7 @@ DISPATCHER(modifierW_Dispatcher);
 struct modifierW_Data
 {
 	Object *CY_Wave, *SL_Speed, *SL_Offset;
-	Object *FG[16];
+	Object *LFO, *FG[16];
 	UBYTE chn;
 };
 

@@ -27,7 +27,7 @@
 /*-----------------------------------------------------------------------------
 - OM_NEW
 ------------------------------------------------------------------------------*/
-ULONG ledC_New(struct IClass *cl, Object *obj, struct opSet *msg)
+ULONG ledC_mNew(struct IClass *cl, Object *obj, struct opSet *msg)
 {
 	struct ledC_Data tmp = {0};
 	struct TagItem *tags;
@@ -43,6 +43,22 @@ ULONG ledC_New(struct IClass *cl, Object *obj, struct opSet *msg)
 	}
 	CoerceMethod(cl, obj, OM_DISPOSE);
 	return 0;
+}
+
+/*-----------------------------------------------------------------------------
+- ledC_mSet
+------------------------------------------------------------------------------*/
+ULONG ledC_mSet(struct IClass *cl, Object *obj, struct opSet *msg)
+{
+	struct ledC_Data *data = INST_DATA(cl, obj);
+	struct TagItem *tags;
+
+	tags = msg->ops_AttrList;
+	data->pos = (UBYTE)GetTagData(MUIA_ledC_Position, 0, tags);
+
+	MUI_Redraw(obj, MADF_DRAWUPDATE);
+
+	return DoSuperMethodA(cl, obj, (Msg)msg);
 }
 
 /*-----------------------------------------------------------------------------
@@ -74,7 +90,7 @@ ULONG ledC_mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 
 	SetAPen(_rp(obj), _dri(obj)->dri_Pens[TEXTPEN]);
 
-	if (seqPos[0] == data->chn)
+	if (tsidata->seqPos[0] == data->chn)
 		SetAPen(_rp(obj), _dri(obj)->dri_Pens[FILLPEN]);
 
 	RectFill(_rp(obj), _mleft(obj), _mtop(obj), _mright(obj), _mbottom(obj));
@@ -89,9 +105,11 @@ ULONG ledC_mUpdate(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 {
 	struct ledC_Data *data = INST_DATA(cl, obj);
 
+	DoSuperMethodA(cl, obj, (Msg)msg);
+
 	SetAPen(_rp(obj), _dri(obj)->dri_Pens[TEXTPEN]);
 
-	if (seqPos[0] == data->chn)
+	if (tsidata->seqPos[0] == data->chn)
 		SetAPen(_rp(obj), _dri(obj)->dri_Pens[FILLPEN]);
 
 	RectFill(_rp(obj), _mleft(obj), _mtop(obj), _mright(obj), _mbottom(obj));
@@ -107,16 +125,16 @@ DISPATCHER(ledC_Dispatcher)
 	switch (msg->MethodID)
 	{
 		case OM_NEW:
-			return ledC_New(cl, obj, (APTR)msg);
+			return ledC_mNew(cl, obj, (APTR)msg);
+
+		case OM_SET:
+			return ledC_mSet(cl, obj, (APTR)msg);
 
 		case MUIM_AskMinMax:
 			return ledC_mAskMinMax(cl, obj, (APTR)msg);
 
 		case MUIM_Draw:
 			return ledC_mDraw(cl, obj, (APTR)msg);
-
-		case MUIM_ledC_Update:
-			return ledC_mUpdate(cl, obj, (APTR)msg);
 	}
 
 	return (DoSuperMethodA(cl, obj, msg));

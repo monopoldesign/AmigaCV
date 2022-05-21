@@ -24,7 +24,8 @@
 /******************************************************************************
 * Prototypes
 *******************************************************************************/
-ULONG faderCvSeqG_New(struct IClass *cl, Object *obj, struct opSet *msg);
+ULONG faderCvSeqG_mNew(struct IClass *cl, Object *obj, struct opSet *msg);
+ULONG faderCvSeqG_mSet(struct IClass *cl, Object *obj, struct opSet *msg);
 ULONG faderCvSeqG_Slider(struct IClass *cl, Object *obj, struct MUIP_faderCvSeqG_SL_Level *msg);
 DISPATCHER(faderCvSeqG_Dispatcher);
 
@@ -33,10 +34,10 @@ DISPATCHER(faderCvSeqG_Dispatcher);
 *******************************************************************************/
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
 #define MUIM_faderCvSeqG_Slider		TAGBASE_CLASS + 1
-#define MUIM_faderCvSeqG_Update		TAGBASE_CLASS + 2
 
 #define MUIA_faderCvSeqG_Dest		TAGBASE_CLASS + 1
 #define MUIA_faderCvSeqG_Channel	TAGBASE_CLASS + 2
+#define MUIA_faderCvSeqG_Position	TAGBASE_CLASS + 3
 
 struct faderCvSeqG_Data
 {
@@ -45,6 +46,7 @@ struct faderCvSeqG_Data
 	LONG level;
 	UBYTE *dest;
 	UBYTE chn;
+	UBYTE pos;
 };
 
 struct MUIP_faderCvSeqG_SL_Level {ULONG MethodID; LONG level; };

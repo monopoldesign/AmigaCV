@@ -24,7 +24,8 @@
 /******************************************************************************
 * Prototypes
 *******************************************************************************/
-ULONG ledC_New(struct IClass *cl, Object *obj, struct opSet *msg);
+ULONG ledC_mNew(struct IClass *cl, Object *obj, struct opSet *msg);
+ULONG ledC_mSet(struct IClass *cl, Object *obj, struct opSet *msg);
 ULONG ledC_mAskMinMax(struct IClass *cl, Object *obj, struct MUIP_AskMinMax *msg);
 ULONG ledC_mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg);
 ULONG ledC_mUpdate(struct IClass *cl, Object *obj, struct MUIP_Draw *msg);
@@ -35,14 +36,13 @@ DISPATCHER(ledC_Dispatcher);
 *******************************************************************************/
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
 
-#define MUIM_ledC_Update	TAGBASE_CLASS + 2
-
 #define MUIA_ledC_Channel	TAGBASE_CLASS + 1
+#define MUIA_ledC_Position	TAGBASE_CLASS + 2
 
 struct ledC_Data
 {
 	ULONG chn;
-	UBYTE oldPhase;
+	UBYTE pos;
 };
 
 #endif

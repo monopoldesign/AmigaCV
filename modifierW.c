@@ -85,7 +85,7 @@ ULONG modifierW_New(struct IClass *cl, Object *obj, struct opSet *msg)
 																		End,
 																	End,
 																End,
-																Child, myLFO[tmp.chn] = NewObject(CL_lfoC->mcc_Class, NULL, MUIA_lfoC_Channel, tmp.chn, TextFrame, MUIA_Background, MUII_BACKGROUND, TAG_DONE),
+																Child, tmp.LFO = NewObject(CL_lfoC->mcc_Class, NULL, MUIA_lfoC_Channel, tmp.chn, TextFrame, MUIA_Background, MUII_BACKGROUND, TAG_DONE),
 															End,
 								TAG_MORE, msg->ops_AttrList);
 			break;
@@ -210,9 +210,9 @@ ULONG modifierW_Finish(struct IClass *cl, Object *obj, Msg msg)
 	struct modifierW_Data *data = INST_DATA(cl, obj);
 
 	set(obj, MUIA_Window_Open, FALSE);
-	DoMethod((Object *)xget(obj, MUIA_ApplicationObject), OM_REMMEMBER, obj);
+
 	modifierW[data->chn] = NULL;
-	myLFO[data->chn] = NULL;
+	DoMethod((Object *)xget(obj, MUIA_ApplicationObject), OM_REMMEMBER, obj);
 	MUI_DisposeObject(obj);
 
 	return 0;
@@ -226,7 +226,7 @@ ULONG modifierW_Wave(struct IClass *cl, Object *obj, struct MUIP_modifierW_CY_Wa
 	struct modifierW_Data *data = INST_DATA(cl, obj);
 
 	LFOWave[data->chn] = msg->wave;
-	DoMethod(myLFO[data->chn], MUIM_Draw);
+	DoMethod(data->LFO, MUIM_Draw);
 	return 0;
 }
 
@@ -249,7 +249,7 @@ ULONG modifierW_Offset(struct IClass *cl, Object *obj, struct MUIP_modifierW_SL_
 	struct modifierW_Data *data = INST_DATA(cl, obj);
 
 	LFOOffset[data->chn] = msg->offset;
-	DoMethod(myLFO[data->chn], MUIM_Draw);
+	DoMethod(data->LFO, MUIM_Draw);
 	return 0;
 }
 
@@ -261,8 +261,18 @@ ULONG modifierW_Update(struct IClass *cl, Object *obj, Msg msg)
 	int i;
 	struct modifierW_Data *data = INST_DATA(cl, obj);
 
-	for (i = 0; i < 16; i++)
-		DoMethod(data->FG[i], MUIM_faderCvSeqG_Update);
+	DoSuperMethodA(cl, obj, msg);
+
+	switch (modType[data->chn])
+	{
+		case MOD_LFO:
+			set(data->LFO, MUIA_lfoC_Phase, tsidata2->phaseCnt[data->chn]);
+			break;
+		case MOD_CVSEQ:
+			for (i = 0; i < 16; i++)
+				set(data->FG[i], MUIA_faderCvSeqG_Position, tsidata->seqPos[data->chn]);
+			break;
+	}
 
 	return 0;
 }
