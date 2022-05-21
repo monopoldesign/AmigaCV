@@ -34,6 +34,7 @@ ULONG ledC_mNew(struct IClass *cl, Object *obj, struct opSet *msg)
 
 	tags = msg->ops_AttrList;
 	tmp.chn = (UBYTE)GetTagData(MUIA_ledC_Channel, 0, tags);
+	tmp.step = (UBYTE)GetTagData(MUIA_ledC_Step, 0, tags);
 
 	if (obj = (Object *)DoSuperMethodA(cl, obj, (APTR)msg))
 	{
@@ -50,14 +51,7 @@ ULONG ledC_mNew(struct IClass *cl, Object *obj, struct opSet *msg)
 ------------------------------------------------------------------------------*/
 ULONG ledC_mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 {
-	struct ledC_Data *data = INST_DATA(cl, obj);
-	struct TagItem *tags;
-
-	tags = msg->ops_AttrList;
-	data->pos = (UBYTE)GetTagData(MUIA_ledC_Position, 0, tags);
-
 	MUI_Redraw(obj, MADF_DRAWUPDATE);
-
 	return DoSuperMethodA(cl, obj, (Msg)msg);
 }
 
@@ -90,26 +84,7 @@ ULONG ledC_mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 
 	SetAPen(_rp(obj), _dri(obj)->dri_Pens[TEXTPEN]);
 
-	if (tsidata->seqPos[0] == data->chn)
-		SetAPen(_rp(obj), _dri(obj)->dri_Pens[FILLPEN]);
-
-	RectFill(_rp(obj), _mleft(obj), _mtop(obj), _mright(obj), _mbottom(obj));
-
-	return (0);
-}
-
-/*-----------------------------------------------------------------------------
-- Draw-Method
-------------------------------------------------------------------------------*/
-ULONG ledC_mUpdate(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
-{
-	struct ledC_Data *data = INST_DATA(cl, obj);
-
-	DoSuperMethodA(cl, obj, (Msg)msg);
-
-	SetAPen(_rp(obj), _dri(obj)->dri_Pens[TEXTPEN]);
-
-	if (tsidata->seqPos[0] == data->chn)
+	if (tsidata->seqPos[data->chn] == data->step)
 		SetAPen(_rp(obj), _dri(obj)->dri_Pens[FILLPEN]);
 
 	RectFill(_rp(obj), _mleft(obj), _mtop(obj), _mright(obj), _mbottom(obj));
@@ -134,7 +109,7 @@ DISPATCHER(ledC_Dispatcher)
 			return ledC_mAskMinMax(cl, obj, (APTR)msg);
 
 		case MUIM_Draw:
-			return ledC_mDraw(cl, obj, (APTR)msg);
+			return ledC_mDraw(cl, obj, (struct MUIP_Draw *)msg);
 	}
 
 	return (DoSuperMethodA(cl, obj, msg));

@@ -69,7 +69,7 @@ BOOL isPlaying = FALSE;
 UBYTE AudioIn[8] = {0, 10, 20, 30, 40, 50, 60, 70};
 UBYTE AudioOut[8] = {70, 60, 50, 40, 30, 20, 10, 0};
 UBYTE CVin[8] = {1, 2, 4, 8, 16, 32, 64, 128};
-UBYTE modType[8] = {MOD_LFO, MOD_CVSEQ, MOD_LFO, MOD_DC, MOD_LFO, MOD_DC, MOD_LFO, MOD_DC};
+UBYTE modType[8] = {MOD_CVSEQ, MOD_CVSEQ, MOD_CVSEQ, MOD_CVSEQ, MOD_LFO, MOD_LFO, MOD_LFO, MOD_DC};
 
 #define OFF	0
 #define ON	1
@@ -96,22 +96,6 @@ s* Main-Program
 ------------------------------------------------------------------------------*/
 int main(int argc, char *argv[])
 {
-	/*
-	if (addInterrupt())
-	{
-		printf("starting softint. CTRL-C to break...\n");
-
-		while(1)
-		{
-			Wait(SIGBREAKF_CTRL_C);
-			break;
-		}
-
-		endInterrupt();
-	}
-	exit(0);
-	*/
-
 	if (initLibs())
 	{
 		if (SetupScreen())

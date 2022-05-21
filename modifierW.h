@@ -47,6 +47,8 @@ struct modifierW_Data
 	UBYTE chn;
 };
 
+#define mysize sizeof(struct modifierW_Data);
+
 struct MUIP_modifierW_CY_Wave {ULONG MethodID; LONG wave; };
 struct MUIP_modifierW_SL_Speed {ULONG MethodID; LONG speed; };
 struct MUIP_modifierW_SL_Offset {ULONG MethodID; LONG offset; };

@@ -38,10 +38,11 @@ ULONG faderCvSeqG_mNew(struct IClass *cl, Object *obj, struct opSet *msg)
 	struct TagItem *tags;
 
 	tags = msg->ops_AttrList;
-	tmp.dest = (APTR)GetTagData(MUIA_faderCvSeqG_Dest, 0, tags);
 	tmp.chn = (UBYTE)GetTagData(MUIA_faderCvSeqG_Channel, 0, tags);
+	tmp.dest = (APTR)GetTagData(MUIA_faderCvSeqG_Dest, 0, tags);
+	tmp.step = (UBYTE)GetTagData(MUIA_faderCvSeqG_Step, 0, tags);
 
-	sprintf(buffer, "%d", tmp.chn + 1);
+	sprintf(buffer, "%d", tmp.step + 1);
 
 	if (obj = (Object *)DoSuperNew(cl, obj,
 			Child, VGroup,
@@ -69,7 +70,7 @@ ULONG faderCvSeqG_mNew(struct IClass *cl, Object *obj, struct opSet *msg)
 					MUIA_Background, MUII_TextBack,
 					MUIA_Frame, MUIV_Frame_Text,
 				End,
-				Child, tmp.led = NewObject(CL_ledC->mcc_Class, NULL, MUIA_ledC_Channel, tmp.chn, MUIA_Frame, MUIV_Frame_Gauge, TAG_DONE),
+				Child, tmp.led = NewObject(CL_ledC->mcc_Class, NULL, MUIA_ledC_Channel, tmp.chn, MUIA_ledC_Step, tmp.step, MUIA_Frame, MUIV_Frame_Gauge, TAG_DONE),
 			End));
 	{
 		struct faderCvSeqG_Data *data = INST_DATA(cl, obj);
@@ -92,12 +93,14 @@ ULONG faderCvSeqG_mNew(struct IClass *cl, Object *obj, struct opSet *msg)
 ------------------------------------------------------------------------------*/
 ULONG faderCvSeqG_mSet(struct IClass *cl, Object *obj, struct opSet *msg)
 {
-	struct faderCvSeqG_Data *data = INST_DATA(cl, obj);
-	struct TagItem *tags;
+	//struct faderCvSeqG_Data *data = INST_DATA(cl, obj);
+	//struct TagItem *tags;
 
-	tags = msg->ops_AttrList;
-	data->pos = (UBYTE)GetTagData(MUIA_faderCvSeqG_Position, 0, tags);
-	set(data->led, MUIA_ledC_Position, data->pos);
+	//tags = msg->ops_AttrList;
+	//data->pos = (UBYTE)GetTagData(MUIA_faderCvSeqG_Position, 0, tags);
+	//set(data->led, MUIA_ledC_Position, data->pos);
+
+	MUI_Redraw(obj, MADF_DRAWUPDATE);
 
 	return DoSuperMethodA(cl, obj, (Msg)msg);
 }

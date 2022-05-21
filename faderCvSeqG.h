@@ -35,9 +35,10 @@ DISPATCHER(faderCvSeqG_Dispatcher);
 #define TAGBASE_CLASS (TAG_USER | 0x80420000)
 #define MUIM_faderCvSeqG_Slider		TAGBASE_CLASS + 1
 
-#define MUIA_faderCvSeqG_Dest		TAGBASE_CLASS + 1
-#define MUIA_faderCvSeqG_Channel	TAGBASE_CLASS + 2
-#define MUIA_faderCvSeqG_Position	TAGBASE_CLASS + 3
+#define MUIA_faderCvSeqG_Channel	TAGBASE_CLASS + 1
+#define MUIA_faderCvSeqG_Dest		TAGBASE_CLASS + 2
+#define MUIA_faderCvSeqG_Step		TAGBASE_CLASS + 3
+#define MUIA_faderCvSeqG_Dummy		TAGBASE_CLASS + 4
 
 struct faderCvSeqG_Data
 {
@@ -45,8 +46,8 @@ struct faderCvSeqG_Data
 	Object *led;
 	LONG level;
 	UBYTE *dest;
-	UBYTE chn;
-	UBYTE pos;
+
+	UBYTE chn, step, pos;
 };
 
 struct MUIP_faderCvSeqG_SL_Level {ULONG MethodID; LONG level; };
