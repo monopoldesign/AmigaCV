@@ -205,12 +205,8 @@ BOOL startInterrupts(void)
 	if (intData = AllocVec(sizeof(struct InterruptData), MEMF_PUBLIC|MEMF_CLEAR))
 	{
 		if (addInterrupt_LFO())
-		{
-			if (addInterrupt_SEQ())
-			{
-				return TRUE;
-			}
-		}
+			return TRUE;
+
 		FreeVec(intData);
 	}
 	return FALSE;
@@ -221,7 +217,9 @@ BOOL startInterrupts(void)
 ------------------------------------------------------------------------------*/
 void endInterrupts(void)
 {
-	endInterrupt_SEQ();
+	if (isPlaying)
+		endInterrupt_SEQ();
+
 	endInterrupt_LFO();
 
 	if (intData)

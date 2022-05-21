@@ -67,9 +67,6 @@ struct InterruptData
 	struct MsgPort *intPort_LFO;
 	struct MsgPort *intPort_SEQ;
 
-	UBYTE seqPos[8];
-	UBYTE seqPrescale[8];
-
 	ULONG phaseCnt[8];
 	ULONG sampleCnt[8];
 	BYTE LFOVal[8];
@@ -108,6 +105,8 @@ extern UBYTE CVSeq[16];
 
 extern ULONG tempo;
 extern BOOL isPlaying;
+extern BYTE seqPos[8];
+extern BYTE seqPrescale[8];
 
 extern UBYTE AudioIn[8];
 extern UBYTE AudioOut[8];

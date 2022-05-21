@@ -18,6 +18,7 @@
 *******************************************************************************/
 #include "main.h"
 #include "ctrlW.h"
+#include "CVSeq.h"
 #include "help.h"
 
 /******************************************************************************
@@ -104,18 +105,28 @@ ULONG ctrlW_Status(struct IClass *cl, Object *obj, Msg msg)
 	if (isPlaying)
 	{
 		isPlaying = FALSE;
+		endInterrupt_SEQ();
 		DoMethod(data->TX_Status, MUIM_Set, MUIA_Text_Contents, "Stopped...");
 		DoMethod(data->BT_Status, MUIM_Set, MUIA_Text_Contents, "Play");
 	}
 	else
 	{
 		isPlaying = TRUE;
+
+		for (i = 0; i < 8; i++)
+		{
+			if (modType[i] == MOD_CVSEQ)
+				cvseq_playInit(i);
+		}
+
+		addInterrupt_SEQ();
+
 		DoMethod(data->TX_Status, MUIM_Set, MUIA_Text_Contents, "Playing...");
 		DoMethod(data->BT_Status, MUIM_Set, MUIA_Text_Contents, "Stop");
 	}
 
-	for (i = 0; i < 8; i++)
-		printf("In%d: %d, Out%d: %d, CVin%d: %d\n", i, AudioIn[i], i, AudioOut[i], i, CVin[i]);
+	//for (i = 0; i < 8; i++)
+	//	printf("In%d: %d, Out%d: %d, CVin%d: %d\n", i, AudioIn[i], i, AudioOut[i], i, CVin[i]);
 
 	return 0;
 }

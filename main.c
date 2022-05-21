@@ -17,9 +17,10 @@
 * Header-Files
 *******************************************************************************/
 #include "main.h"
+#include "CVSeq.h"
 #include "help.h"
-#include "modifierW.h"
 #include "lfoC.h"
+#include "modifierW.h"
 
 /******************************************************************************
 * Global Variables
@@ -59,6 +60,8 @@ UBYTE CVSeq[16] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 85, 90, 95, 100, 105, 110,
 
 ULONG tempo = 120;
 BOOL isPlaying = FALSE;
+BYTE seqPos[8];
+BYTE seqPrescale[8];
 
 UBYTE AudioIn[8] = {0, 10, 20, 30, 40, 50, 60, 70};
 UBYTE AudioOut[8] = {70, 60, 50, 40, 30, 20, 10, 0};
@@ -315,15 +318,8 @@ void Interrupt_SEQ(void)
 	{
 		for (i = 0; i < 8; i++)
 		{
-			intData->seqPrescale[i]++;
-			if (intData->seqPrescale[i] == 6)
-			{
-				intData->seqPrescale[i] = 0;
-
-				intData->seqPos[i]++;
-				if (intData->seqPos[i] > 15)
-					intData->seqPos[i] = 0;
-			}
+			if (modType[i] == MOD_CVSEQ)
+				cvseq_play(i);
 		}
 
 		int_tr_SEQ->tr_node.io_Command = TR_ADDREQUEST;
