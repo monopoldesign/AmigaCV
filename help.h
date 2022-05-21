@@ -35,4 +35,24 @@ BOOL SetupScreen(void);
 void CloseDownScreen(void);
 void errorShutdown(char *errorMsg);
 
+BOOL startInterrupts(void);
+void endInterrupts(void);
+BOOL addInterrupt_LFO(void);
+void endInterrupt_LFO(void);
+BOOL addInterrupt_SEQ(void);
+void endInterrupt_SEQ(void);
+
+/******************************************************************************
+* Definitions
+*******************************************************************************/
+enum INT {INT_OFF, INT_ON, INT_STOPPED};
+
+/******************************************************************************
+* Global Variables
+*******************************************************************************/
+extern const ULONG tempoTab[221];
+
+extern struct timerequest *int_tr_LFO;
+extern struct timerequest *int_tr_SEQ;
+
 #endif

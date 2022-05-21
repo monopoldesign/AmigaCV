@@ -50,13 +50,8 @@ BOOL addDispTask();
 void remDispTask();
 void dispTask();
 
-BOOL addInterrupt(void);
-void endInterrupt(void);
-void tsoftcode(void);
-
-BOOL addInterrupt2(void);
-void endInterrupt2(void);
-void tsoftcode2(void);
+void Interrupt_LFO(void);
+void Interrupt_SEQ(void);
 
 /******************************************************************************
 * Definitions
@@ -65,20 +60,16 @@ void tsoftcode2(void);
 
 enum MODTYPE {MOD_LFO, MOD_CVSEQ, MOD_DC};
 
-struct TSIData
+struct InterruptData
 {
-	ULONG tsi_Counter;
-	ULONG tsi_Flag;
+	ULONG intFlag_LFO;
+	ULONG intFlag_SEQ;
+	struct MsgPort *intPort_LFO;
+	struct MsgPort *intPort_SEQ;
+
 	UBYTE seqPos[8];
 	UBYTE seqPrescale[8];
-	struct MsgPort *tsi_Port;
-};
 
-struct TSIData2
-{
-	ULONG tsi_Counter;
-	ULONG tsi_Flag;
-	struct MsgPort *tsi_Port;
 	ULONG phaseCnt[8];
 	ULONG sampleCnt[8];
 	BYTE LFOVal[8];
@@ -123,7 +114,6 @@ extern UBYTE AudioOut[8];
 extern UBYTE CVin[8];
 extern UBYTE modType[8];
 
-extern struct TSIData *tsidata;
-extern struct TSIData2 *tsidata2;
+extern struct InterruptData *intData;
 
 #endif

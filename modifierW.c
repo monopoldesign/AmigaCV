@@ -266,7 +266,7 @@ ULONG modifierW_Update(struct IClass *cl, Object *obj, Msg msg)
 	switch (modType[data->chn])
 	{
 		case MOD_LFO:
-			set(data->LFO, MUIA_lfoC_Phase, tsidata2->phaseCnt[data->chn]);
+			set(data->LFO, MUIA_lfoC_Phase, intData->phaseCnt[data->chn]);
 			break;
 		case MOD_CVSEQ:
 			for (i = 0; i < 16; i++)

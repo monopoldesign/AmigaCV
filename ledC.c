@@ -84,7 +84,7 @@ ULONG ledC_mDraw(struct IClass *cl, Object *obj, struct MUIP_Draw *msg)
 
 	SetAPen(_rp(obj), _dri(obj)->dri_Pens[TEXTPEN]);
 
-	if (tsidata->seqPos[data->chn] == data->step)
+	if (intData->seqPos[data->chn] == data->step)
 		SetAPen(_rp(obj), _dri(obj)->dri_Pens[FILLPEN]);
 
 	RectFill(_rp(obj), _mleft(obj), _mtop(obj), _mright(obj), _mbottom(obj));
